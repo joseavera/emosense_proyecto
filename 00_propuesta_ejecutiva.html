@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmoSense — Propuesta Ejecutiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ══ RESET ══════════════════════════════════════════════ */
+*{ box-sizing:border-box; margin:0; padding:0 }
+:root{
+  --cream:#f7f3ee;
+  --warm:#faf8f5;
+  --ink:#1c1510;
+  --ink2:#44403c;
+  --ink3:#78716c;
+  --rule:#e5ddd5;
+  --purple:#5b21b6;
+  --purple-l:#ede9fe;
+  --amber:#b45309;
+  --amber-l:#fef3c7;
+  --joy:#d97706;
+  --joy-l:#fefce8;
+  --sadness:#1d4ed8;
+  --sadness-l:#eff6ff;
+  --anger:#b91c1c;
+  --anger-l:#fef2f2;
+  --fear:#6d28d9;
+  --fear-l:#f5f3ff;
+  --surprise:#0f766e;
+  --surprise-l:#f0fdfa;
+  --disgust:#4d7c0f;
+  --disgust-l:#f7fee7;
+  --serif:'Playfair Display',serif;
+  --sans:'DM Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{ scroll-behavior:smooth }
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:14.5px;
+  line-height:1.7;
+}
+
+/* ══ PRINT ══════════════════════════════════════════════ */
+@media print{
+  .no-print{ display:none }
+  body{ font-size:11px }
+  .sec{ padding:28px }
+}
+
+/* ══ SIDEBAR ════════════════════════════════════════════ */
+.sidebar{
+  position:fixed; left:0; top:0; bottom:0;
+  width:200px;
+  background:var(--ink);
+  padding:24px 0;
+  overflow-y:auto;
+  z-index:100;
+}
+.sb-logo{
+  padding:0 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  margin-bottom:16px;
+}
+.sb-project{
+  font-family:var(--mono);
+  font-size:9px; letter-spacing:2px;
+  color:rgba(255,255,255,.35);
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+.sb-title{
+  font-family:var(--serif);
+  font-size:17px; font-weight:700;
+  color:#fff; line-height:1.2;
+}
+.sb-title span{ color:var(--amber); font-style:italic }
+.sb-section{ padding:0 12px; margin-bottom:6px }
+.sb-lbl{
+  font-family:var(--mono);
+  font-size:9px; letter-spacing:1.5px;
+  color:rgba(255,255,255,.3);
+  text-transform:uppercase;
+  padding:0 8px; margin-bottom:4px;
+}
+.sb-item{
+  display:flex; align-items:center; gap:8px;
+  padding:7px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:all .15s;
+  margin-bottom:2px;
+}
+.sb-item:hover{ background:rgba(255,255,255,.07) }
+.sb-item.active{
+  background:rgba(180,83,9,.15);
+  border-left:2px solid var(--amber);
+}
+.sb-num{
+  font-family:var(--mono); font-size:10px;
+  color:rgba(255,255,255,.3); min-width:18px;
+}
+.sb-item.active .sb-num{ color:var(--amber) }
+.sb-text{ font-size:11.5px; color:rgba(255,255,255,.5) }
+.sb-item.active .sb-text{ color:rgba(255,255,255,.85) }
+.sb-version{
+  position:absolute; bottom:16px; left:0; right:0;
+  text-align:center;
+  font-family:var(--mono); font-size:9px;
+  color:rgba(255,255,255,.2); letter-spacing:1px;
+}
+
+/* ══ MAIN ════════════════════════════════════════════════ */
+.main{ margin-left:200px }
+#prog{
+  position:fixed; top:0; left:200px; right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--amber),var(--purple));
+  z-index:200; transition:width .2s;
+}
+
+/* ══ SECTIONS ════════════════════════════════════════════ */
+.sec{
+  min-height:100vh;
+  padding:64px 60px;
+  border-bottom:1px solid var(--rule);
+  position:relative;
+}
+.sec.dark{
+  background:var(--ink);
+  color:rgba(247,243,238,.85);
+}
+.sec.warm{ background:var(--warm) }
+
+/* ══ TYPOGRAPHY ══════════════════════════════════════════ */
+.eyebrow{
+  font-family:var(--mono);
+  font-size:10px; letter-spacing:3px;
+  color:var(--amber); text-transform:uppercase;
+  margin-bottom:14px;
+}
+.sec.dark .eyebrow{ color:var(--amber) }
+.h1{
+  font-family:var(--serif);
+  font-size:clamp(42px,5.5vw,72px);
+  font-weight:900; line-height:1.05;
+  color:var(--ink); margin-bottom:14px;
+}
+.sec.dark .h1{ color:#fff }
+.h1 em{ color:var(--amber); font-style:italic }
+.h1 span{ color:var(--purple) }
+.h2{
+  font-family:var(--serif);
+  font-size:clamp(24px,3vw,36px);
+  font-weight:700; color:var(--ink);
+  margin-bottom:8px;
+}
+.sec.dark .h2{ color:#fff }
+.h3{
+  font-family:var(--serif);
+  font-size:18px; font-weight:600;
+  color:var(--ink); margin-bottom:6px;
+}
+.sec.dark .h3{ color:rgba(255,255,255,.9) }
+.lead{
+  font-size:16px; color:var(--ink2);
+  max-width:660px; line-height:1.75;
+  margin-bottom:32px;
+}
+.sec.dark .lead{ color:rgba(247,243,238,.6) }
+.rule-line{
+  width:48px; height:3px;
+  background:linear-gradient(90deg,var(--amber),var(--purple));
+  border-radius:2px; margin-bottom:28px;
+}
+
+/* ══ META PILLS ══════════════════════════════════════════ */
+.meta-row{ display:flex; gap:20px; flex-wrap:wrap; margin-top:28px }
+.meta{
+  border-left:2px solid var(--amber);
+  padding-left:10px;
+}
+.meta .ml{
+  font-family:var(--mono); font-size:9px;
+  color:var(--ink3); letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:3px;
+}
+.sec.dark .meta .ml{ color:rgba(255,255,255,.35) }
+.meta .mv{
+  font-size:13px; font-weight:500; color:var(--ink);
+}
+.sec.dark .meta .mv{ color:rgba(255,255,255,.8) }
+
+/* ══ CALLOUT ═════════════════════════════════════════════ */
+.callout{
+  border-radius:8px;
+  padding:16px 20px 16px 48px;
+  font-size:13.5px; margin:14px 0;
+  position:relative; line-height:1.65;
+}
+.callout::before{
+  content:attr(data-i);
+  position:absolute; left:14px;
+  top:50%; transform:translateY(-50%);
+  font-size:18px;
+}
+.ci{
+  background:var(--purple-l);
+  border:1px solid rgba(91,33,182,.2);
+  color:var(--purple);
+}
+.ca{
+  background:var(--amber-l);
+  border:1px solid rgba(180,83,9,.2);
+  color:var(--amber);
+}
+.callout strong{ font-weight:600 }
+
+/* ══ CARDS ════════════════════════════════════════════════ */
+.grid{ display:grid; gap:14px }
+.g2{ grid-template-columns:1fr 1fr }
+.g3{ grid-template-columns:repeat(3,1fr) }
+.g4{ grid-template-columns:repeat(4,1fr) }
+.card{
+  background:#fff;
+  border:1.5px solid var(--rule);
+  border-radius:10px;
+  padding:20px; position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:3px; border-radius:10px 10px 0 0;
+}
+.card-tag{
+  font-family:var(--mono); font-size:10px;
+  font-weight:600; letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:8px;
+}
+.card-title{
+  font-family:var(--serif);
+  font-size:15px; font-weight:600;
+  margin-bottom:6px; color:var(--ink);
+}
+.card-body{
+  font-size:12.5px; color:var(--ink2);
+  line-height:1.6;
+}
+.card-note{
+  font-family:var(--mono); font-size:11px;
+  margin-top:10px; padding:7px 10px;
+  border-radius:4px; border-left:2px solid;
+}
+
+/* ══ EMOTION COLORS ══════════════════════════════════════ */
+.ej::before{ background:var(--joy) }
+.ej .card-tag{ color:var(--joy) }
+.ej .card-note{ color:var(--joy); border-color:var(--joy); background:var(--joy-l) }
+.es::before{ background:var(--sadness) }
+.es .card-tag{ color:var(--sadness) }
+.es .card-note{ color:var(--sadness); border-color:var(--sadness); background:var(--sadness-l) }
+.ea::before{ background:var(--anger) }
+.ea .card-tag{ color:var(--anger) }
+.ea .card-note{ color:var(--anger); border-color:var(--anger); background:var(--anger-l) }
+.ef::before{ background:var(--fear) }
+.ef .card-tag{ color:var(--fear) }
+.ef .card-note{ color:var(--fear); border-color:var(--fear); background:var(--fear-l) }
+.esu::before{ background:var(--surprise) }
+.esu .card-tag{ color:var(--surprise) }
+.esu .card-note{ color:var(--surprise); border-color:var(--surprise); background:var(--surprise-l) }
+.ed::before{ background:var(--disgust) }
+.ed .card-tag{ color:var(--disgust) }
+.ed .card-note{ color:var(--disgust); border-color:var(--disgust); background:var(--disgust-l) }
+
+/* ══ PHASE BLOCKS ════════════════════════════════════════ */
+.phases{ display:flex; flex-direction:column; gap:0 }
+.phase{
+  display:grid;
+  grid-template-columns:80px 1fr;
+  gap:0;
+  border:1.5px solid var(--rule);
+  border-bottom:none; background:#fff;
+}
+.phase:first-child{ border-radius:8px 8px 0 0 }
+.phase:last-child{ border-bottom:1.5px solid var(--rule); border-radius:0 0 8px 8px }
+.phase-num{
+  background:var(--ink);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  font-family:var(--serif);
+  font-size:28px; font-weight:900;
+  color:rgba(255,255,255,.2);
+  padding:20px 0;
+}
+.phase.current .phase-num{
+  background:var(--amber);
+  color:rgba(255,255,255,.9);
+}
+.phase-content{ padding:18px 22px }
+.phase-header{
+  display:flex; align-items:center;
+  gap:12px; margin-bottom:8px;
+}
+.phase-tag{
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:1.5px; text-transform:uppercase;
+  padding:2px 8px; border-radius:3px;
+}
+.phase.current .phase-tag{
+  background:var(--amber-l); color:var(--amber);
+}
+.phase:not(.current) .phase-tag{
+  background:var(--rule); color:var(--ink3);
+}
+.phase-title{
+  font-family:var(--serif);
+  font-size:15px; font-weight:600; color:var(--ink);
+}
+.phase-desc{
+  font-size:12.5px; color:var(--ink2);
+  line-height:1.6; margin-bottom:10px;
+}
+.phase-deliverables{
+  display:flex; gap:6px; flex-wrap:wrap;
+}
+.deliv{
+  display:inline-block;
+  background:var(--cream);
+  border:1px solid var(--rule);
+  font-family:var(--mono);
+  font-size:10px; padding:3px 8px;
+  border-radius:3px; color:var(--ink2);
+}
+.phase.current .deliv{
+  background:var(--amber-l);
+  border-color:rgba(180,83,9,.25);
+  color:var(--amber);
+}
+
+/* ══ ARCH FLOW ════════════════════════════════════════════ */
+.arch-flow{
+  display:flex; align-items:stretch;
+  gap:0; margin:20px 0; flex-wrap:wrap;
+}
+.arch-box{
+  flex:1; min-width:110px;
+  background:#fff;
+  border:1.5px solid var(--rule);
+  padding:14px 12px;
+  text-align:center;
+  position:relative;
+}
+.arch-box:not(:last-child)::after{
+  content:'→';
+  position:absolute; right:-12px; top:50%;
+  transform:translateY(-50%);
+  font-size:16px; color:var(--ink3);
+  z-index:1; background:var(--warm);
+  padding:0 2px;
+}
+.arch-icon{ font-size:20px; margin-bottom:6px }
+.arch-label{
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:1px; color:var(--amber);
+  text-transform:uppercase; margin-bottom:4px;
+}
+.arch-name{
+  font-size:12px; font-weight:600;
+  color:var(--ink); margin-bottom:3px;
+}
+.arch-sub{
+  font-size:11px; color:var(--ink3);
+  line-height:1.4;
+}
+.arch-box.highlight{
+  background:var(--amber-l);
+  border-color:rgba(180,83,9,.3);
+}
+
+/* ══ CODE SNIPPET ════════════════════════════════════════ */
+.code-wrap{
+  background:#0f0c09;
+  border-radius:8px; overflow:hidden;
+  margin:14px 0; border:1px solid rgba(255,255,255,.05);
+}
+.code-bar{
+  background:#1c1510;
+  padding:8px 16px;
+  display:flex; align-items:center; gap:8px;
+}
+.code-dots{ display:flex; gap:5px }
+.code-dots span{
+  width:10px; height:10px; border-radius:50%;
+}
+.dot-r{ background:#ff5f57 }
+.dot-y{ background:#ffbd2e }
+.dot-g{ background:#28c840 }
+.code-fname{
+  font-family:var(--mono); font-size:10px;
+  color:rgba(255,255,255,.3); letter-spacing:.5px;
+  margin-left:4px;
+}
+.code-body{
+  padding:16px 20px;
+  font-family:var(--mono); font-size:12px;
+  line-height:1.9; overflow-x:auto;
+  color:#c8b89a;
+}
+.ck{ color:#c084fc }
+.cf{ color:#60a5fa }
+.cs{ color:#86efac }
+.cn{ color:#fb923c }
+.cc{ color:rgba(200,184,154,.35); font-style:italic }
+
+/* ══ MODULE CONNECT ══════════════════════════════════════ */
+.module-map{
+  display:grid; grid-template-columns:1fr auto 1fr;
+  gap:0; align-items:stretch; margin:20px 0;
+}
+.mod-card{
+  padding:20px 24px;
+  border:2px solid var(--rule); background:#fff;
+}
+.mod-card:first-child{
+  border-radius:8px 0 0 8px;
+  border-right:none;
+  border-top:3px solid var(--purple);
+}
+.mod-card:last-child{
+  border-radius:0 8px 8px 0;
+  border-left:none;
+  border-top:3px solid var(--amber);
+}
+.mod-tag{
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:8px;
+}
+.mod-card:first-child .mod-tag{ color:var(--purple) }
+.mod-card:last-child .mod-tag{ color:var(--amber) }
+.mod-title{
+  font-family:var(--serif); font-size:16px;
+  font-weight:700; color:var(--ink); margin-bottom:10px;
+}
+.mod-items{
+  list-style:none; display:flex;
+  flex-direction:column; gap:6px;
+}
+.mod-items li{
+  display:flex; align-items:flex-start;
+  gap:8px; font-size:12.5px; color:var(--ink2);
+}
+.mod-items li::before{
+  content:'→';
+  flex-shrink:0; margin-top:1px;
+}
+.mod-card:first-child .mod-items li::before{ color:var(--purple) }
+.mod-card:last-child .mod-items li::before{ color:var(--amber) }
+.mod-divider{
+  display:flex; align-items:center; justify-content:center;
+  background:var(--ink); border:2px solid var(--ink);
+  padding:0 14px;
+}
+.mod-divider span{
+  font-family:var(--serif); font-size:28px;
+  font-weight:900; color:rgba(255,255,255,.5);
+  writing-mode:vertical-rl;
+  letter-spacing:3px;
+}
+
+/* ══ FILE TREE ════════════════════════════════════════════ */
+.file-tree{
+  background:#0f0c09; border-radius:8px;
+  padding:18px 22px;
+  font-family:var(--mono); font-size:12px;
+  line-height:1.9; color:rgba(200,184,154,.8);
+}
+.ft-dir{ color:#60a5fa }
+.ft-py{ color:#86efac }
+.ft-pkl{ color:#fb923c }
+.ft-png{ color:#c084fc }
+.ft-active{ color:#fbbf24; font-weight:700 }
+.ft-done{ opacity:.5 }
+
+/* ══ RUBRIC ══════════════════════════════════════════════ */
+.rubric{
+  width:100%; border-collapse:collapse;
+  font-size:13px; margin:16px 0;
+}
+.rubric th{
+  background:var(--ink); color:#fff;
+  padding:10px 14px; text-align:left;
+  font-family:var(--mono); font-size:10px;
+  letter-spacing:1px; text-transform:uppercase;
+}
+.rubric td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--rule);
+  vertical-align:top;
+}
+.rubric tr:nth-child(even) td{ background:var(--warm) }
+.rubric tr:hover td{ background:var(--amber-l) }
+.pts{
+  font-family:var(--mono); font-weight:700;
+  color:var(--amber); text-align:center;
+}
+
+/* ══ TIMELINE ════════════════════════════════════════════ */
+.timeline{
+  position:relative; padding-left:32px;
+  margin:16px 0;
+}
+.timeline::before{
+  content:'';
+  position:absolute; left:7px; top:8px; bottom:8px;
+  width:2px; background:var(--rule);
+}
+.tl-item{
+  position:relative; margin-bottom:20px;
+}
+.tl-item::before{
+  content:'';
+  position:absolute; left:-29px; top:6px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--ink); border:2px solid var(--ink);
+}
+.tl-item.current::before{ background:var(--amber); border-color:var(--amber) }
+.tl-item.done::before{ background:var(--disgust) }
+.tl-header{
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:4px;
+}
+.tl-tag{
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:1.5px; text-transform:uppercase;
+  padding:2px 8px;
+}
+.tl-item.current .tl-tag{ background:var(--amber-l); color:var(--amber) }
+.tl-item:not(.current) .tl-tag{ background:var(--rule); color:var(--ink3) }
+.tl-title{ font-size:14px; font-weight:600; color:var(--ink) }
+.tl-body{ font-size:12.5px; color:var(--ink2); line-height:1.6 }
+
+/* ══ RESPONSIVE ══════════════════════════════════════════ */
+@media(max-width:900px){
+  .sidebar{ display:none }
+  .main{ margin-left:0 }
+  .sec{ padding:36px 22px }
+  .g2,.g3,.g4,.module-map{ grid-template-columns:1fr }
+  .mod-divider{ display:none }
+  .arch-flow{ flex-direction:column }
+  .arch-box::after{ display:none }
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-project">Proyecto Final</div>
+    <div class="sb-title">Emo<span>Sense</span></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-lbl">Propuesta</div>
+    <a href="#s-cover"   class="sb-item active"><span class="sb-num">00</span><span class="sb-text">Portada</span></a>
+    <a href="#s-summary" class="sb-item"><span class="sb-num">01</span><span class="sb-text">Resumen ejecutivo</span></a>
+    <a href="#s-theory"  class="sb-item"><span class="sb-num">02</span><span class="sb-text">Marco cognitivo</span></a>
+    <a href="#s-emociones" class="sb-item"><span class="sb-num">03</span><span class="sb-text">Las 6 emociones</span></a>
+  </div>
+  <div class="sb-section" style="margin-top:8px">
+    <div class="sb-lbl">Técnico</div>
+    <a href="#s-arch"    class="sb-item"><span class="sb-num">04</span><span class="sb-text">Arquitectura</span></a>
+    <a href="#s-phases"  class="sb-item"><span class="sb-num">05</span><span class="sb-text">4 etapas</span></a>
+    <a href="#s-connect" class="sb-item"><span class="sb-num">06</span><span class="sb-text">Conexión curricular</span></a>
+    <a href="#s-stage1"  class="sb-item"><span class="sb-num">07</span><span class="sb-text">Etapa 1 en detalle</span></a>
+  </div>
+  <div class="sb-section" style="margin-top:8px">
+    <div class="sb-lbl">Cierre</div>
+    <a href="#s-files"   class="sb-item"><span class="sb-num">08</span><span class="sb-text">Archivos del proyecto</span></a>
+    <a href="#s-rubric"  class="sb-item"><span class="sb-num">09</span><span class="sb-text">Rúbrica</span></a>
+  </div>
+  <div class="sb-version">v 1.0 · Etapa I</div>
+</nav>
+
+<main class="main">
+
+<!-- ══ 00 · PORTADA ════════════════════════════════════ -->
+<section class="sec dark" id="s-cover">
+  <p class="eyebrow">Proyecto Final Integrador · Módulo III</p>
+  <div class="rule-line"></div>
+  <h1 class="h1">
+    <em>Emo</em><span>Sense</span><br>
+    Sistema de Detección<br>
+    Emocional con IA
+  </h1>
+  <p class="lead">
+    Una aplicación de chat que usa Machine Learning para
+    identificar las emociones del usuario en tiempo real
+    y responder con inteligencia emocional.
+    Construida en Python desde cero, paso a paso.
+  </p>
+  <div class="meta-row">
+    <div class="meta">
+      <div class="ml">Materias integradas</div>
+      <div class="mv">Construye Modelos + Configura Parámetros</div>
+    </div>
+    <div class="meta">
+      <div class="ml">Herramienta</div>
+      <div class="mv">Python IDLE · sklearn · tkinter</div>
+    </div>
+    <div class="meta">
+      <div class="ml">Etapas</div>
+      <div class="mv">4 módulos progresivos</div>
+    </div>
+    <div class="meta">
+      <div class="ml">Producto final</div>
+      <div class="mv">Chat app funcional con modelo propio</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 01 · RESUMEN EJECUTIVO ══════════════════════════ -->
+<section class="sec" id="s-summary">
+  <p class="eyebrow">// 01 · resumen ejecutivo</p>
+  <h2 class="h2">¿Qué es EmoSense?</h2>
+  <p class="lead">
+    EmoSense es un sistema que aprende a reconocer
+    emociones en texto escrito en español y responde
+    de forma empática. Es el proyecto integrador de
+    dos materias: <strong>construir</strong> el modelo
+    y <strong>configurar</strong> sus parámetros.
+  </p>
+
+  <div class="grid g3">
+    <div class="card" style="border-top:3px solid var(--purple)">
+      <div class="card-tag" style="color:var(--purple)">El problema</div>
+      <div class="card-title">
+        ¿Puede una IA entender cómo me siento?
+      </div>
+      <div class="card-body">
+        Las máquinas procesan texto, no emociones.
+        EmoSense entrena un clasificador que aprende
+        los patrones lingüísticos asociados a cada
+        emoción humana básica.
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <div class="card-tag" style="color:var(--amber)">La solución</div>
+      <div class="card-title">
+        Clasificación de texto con Random Forest
+      </div>
+      <div class="card-body">
+        Transformamos frases en vectores TF-IDF y
+        entrenamos un Random Forest para clasificar
+        en 6 emociones universales según el modelo
+        de Paul Ekman (1972).
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--joy)">
+      <div class="card-tag" style="color:var(--joy)">El resultado</div>
+      <div class="card-title">
+        Chat con respuesta empática
+      </div>
+      <div class="card-body">
+        Una ventana de chat en tkinter donde el
+        usuario escribe, el modelo detecta la emoción,
+        muestra la confianza por clase y responde
+        con empatía.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ci" data-i="💡" style="margin-top:20px;max-width:680px">
+    <strong>Conexión clave:</strong>
+    Este proyecto necesita AMBAS materias para funcionar.
+    Sin el modelo bien construido no hay predicción.
+    Sin los parámetros bien configurados el modelo
+    comete errores. Las dos materias son inseparables aquí.
+  </div>
+</section>
+
+
+<!-- ══ 02 · MARCO COGNITIVO ════════════════════════════ -->
+<section class="sec warm" id="s-theory">
+  <p class="eyebrow">// 02 · marco cognitivo</p>
+  <h2 class="h2">Inteligencia Emocional y Machine Learning</h2>
+  <p class="lead">
+    La inteligencia emocional (IE) es la capacidad de
+    reconocer, comprender y gestionar las emociones
+    propias y ajenas. Enseñarle esa capacidad a una
+    máquina es el corazón de este proyecto.
+  </p>
+
+  <div class="grid g2" style="max-width:760px">
+    <div class="card" style="border-top:3px solid var(--purple)">
+      <div class="card-tag" style="color:var(--purple)">
+        Daniel Goleman · 1995
+      </div>
+      <div class="card-title">
+        Modelo de Inteligencia Emocional
+      </div>
+      <div class="card-body">
+        Goleman propuso 5 componentes de la IE:
+        autoconciencia, autorregulación, motivación,
+        empatía y habilidades sociales.
+        <br><br>
+        EmoSense trabaja la primera y la cuarta:
+        identificar emociones (autoconciencia) y
+        responder adecuadamente a las del otro
+        (empatía).
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--anger)">
+      <div class="card-tag" style="color:var(--anger)">
+        Paul Ekman · 1972
+      </div>
+      <div class="card-title">
+        Las 6 Emociones Universales
+      </div>
+      <div class="card-body">
+        Ekman demostró que existen 6 emociones
+        básicas universales, reconocidas en todas
+        las culturas del mundo.
+        <br><br>
+        Son nuestras <strong>6 clases de clasificación</strong>:
+        alegría, tristeza, enojo, miedo, sorpresa y asco.
+        Cada frase en nuestro dataset pertenece a una.
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;padding:20px;background:#fff;border:1.5px solid var(--rule);border-radius:8px;max-width:680px">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">La conexión cognitivo ↔ técnica</div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--ink2)">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:var(--purple);font-weight:600;min-width:160px">Autoconciencia emocional</span>
+        <span>→</span>
+        <span>Clasificar correctamente la emoción de un mensaje (nuestro clasificador)</span>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:var(--purple);font-weight:600;min-width:160px">Regulación emocional</span>
+        <span>→</span>
+        <span>Ajustar los parámetros para que el modelo no sobre-reaccione (sobreajuste)</span>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:var(--purple);font-weight:600;min-width:160px">Empatía</span>
+        <span>→</span>
+        <span>Generar respuestas apropiadas según la emoción detectada (el chat)</span>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="color:var(--purple);font-weight:600;min-width:160px">Conciencia social</span>
+        <span>→</span>
+        <span>Recall: ¿cuántas emociones reales detecta el modelo? (métrica clave aquí)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 03 · LAS 6 EMOCIONES ════════════════════════════ -->
+<section class="sec" id="s-emociones">
+  <p class="eyebrow">// 03 · las 6 clases del modelo</p>
+  <h2 class="h2">Las emociones que aprenderá nuestra IA</h2>
+  <p class="lead">
+    Cada emoción es una clase de clasificación. El modelo
+    aprende a distinguir los patrones lingüísticos únicos
+    de cada una. Estas son también las etiquetas del dataset.
+  </p>
+
+  <div class="grid g3">
+    <div class="card ej">
+      <div class="card-tag">😊 Alegría</div>
+      <div class="card-title">Joy</div>
+      <div class="card-body">
+        Satisfacción, entusiasmo, felicidad.
+        Palabras clave: feliz, contento, emocionado,
+        maravilloso, alegre, pleno.
+      </div>
+      <div class="card-note">"Estoy muy contento con los resultados"</div>
+    </div>
+    <div class="card es">
+      <div class="card-tag">😢 Tristeza</div>
+      <div class="card-title">Sadness</div>
+      <div class="card-body">
+        Melancolía, pérdida, desánimo.
+        Palabras clave: triste, solo, vacío,
+        pena, melancólico, desolado.
+      </div>
+      <div class="card-note">"Siento un vacío enorme en mi pecho"</div>
+    </div>
+    <div class="card ea">
+      <div class="card-tag">😡 Enojo</div>
+      <div class="card-title">Anger</div>
+      <div class="card-body">
+        Rabia, frustración, indignación.
+        Palabras clave: furioso, indignado, harto,
+        rabia, irrita, coraje.
+      </div>
+      <div class="card-note">"Estoy furioso con lo que pasó"</div>
+    </div>
+    <div class="card ef">
+      <div class="card-tag">😨 Miedo</div>
+      <div class="card-title">Fear</div>
+      <div class="card-body">
+        Ansiedad, terror, pánico.
+        Palabras clave: miedo, terror, aterra,
+        angustia, pánico, ansiedad.
+      </div>
+      <div class="card-note">"Me paraliza el miedo ante lo desconocido"</div>
+    </div>
+    <div class="card esu">
+      <div class="card-tag">😲 Sorpresa</div>
+      <div class="card-title">Surprise</div>
+      <div class="card-body">
+        Asombro, impacto, incredulidad.
+        Palabras clave: inesperado, increíble, jamás,
+        boquiabierto, impresiona, asombra.
+      </div>
+      <div class="card-note">"Esto me tomó completamente por sorpresa"</div>
+    </div>
+    <div class="card ed">
+      <div class="card-tag">🤢 Asco</div>
+      <div class="card-title">Disgust</div>
+      <div class="card-body">
+        Repulsión, rechazo moral, náusea.
+        Palabras clave: repugna, asco, náuseas,
+        desagrada, revuelve, repulsión.
+      </div>
+      <div class="card-note">"Me revuelve el estómago lo que hicieron"</div>
+    </div>
+  </div>
+
+  <div class="callout ca" data-i="⚙️" style="margin-top:20px;max-width:700px">
+    <strong>Conexión técnica:</strong>
+    Tener 6 clases (multiclase) es más complejo que
+    los 2 que vimos con el dataset de cáncer. La matriz
+    de confusión ahora será 6×6. Las métricas usarán
+    <strong>average='weighted'</strong>. Esta complejidad
+    es el "nivel siguiente" del módulo.
+  </div>
+</section>
+
+
+<!-- ══ 04 · ARQUITECTURA ════════════════════════════════ -->
+<section class="sec warm" id="s-arch">
+  <p class="eyebrow">// 04 · arquitectura técnica</p>
+  <h2 class="h2">Cómo funciona el sistema</h2>
+  <p class="lead">
+    EmoSense tiene dos componentes: el modelo que aprende
+    y la interfaz que lo usa. En la Etapa 1 construimos
+    el modelo. En la Etapa 3 construimos la interfaz.
+  </p>
+
+  <div class="arch-flow">
+    <div class="arch-box">
+      <div class="arch-icon">💬</div>
+      <div class="arch-label">Entrada</div>
+      <div class="arch-name">Texto del usuario</div>
+      <div class="arch-sub">Frase en español escrita en el chat</div>
+    </div>
+    <div class="arch-box">
+      <div class="arch-icon">🧹</div>
+      <div class="arch-label">Paso 1</div>
+      <div class="arch-name">Limpieza de texto</div>
+      <div class="arch-sub">Minúsculas, sin puntuación, sin ruido</div>
+    </div>
+    <div class="arch-box highlight">
+      <div class="arch-icon">📐</div>
+      <div class="arch-label">Paso 2 — parámetro</div>
+      <div class="arch-name">TF-IDF</div>
+      <div class="arch-sub">Convierte texto a vector numérico</div>
+    </div>
+    <div class="arch-box highlight">
+      <div class="arch-icon">🌲</div>
+      <div class="arch-label">Paso 3 — modelo</div>
+      <div class="arch-name">Random Forest</div>
+      <div class="arch-sub">Clasifica en 6 emociones</div>
+    </div>
+    <div class="arch-box">
+      <div class="arch-icon">📊</div>
+      <div class="arch-label">Salida A</div>
+      <div class="arch-name">Emoción + confianza</div>
+      <div class="arch-sub">Ej: Tristeza 83%</div>
+    </div>
+    <div class="arch-box">
+      <div class="arch-icon">🤝</div>
+      <div class="arch-label">Salida B</div>
+      <div class="arch-name">Respuesta empática</div>
+      <div class="arch-sub">Mensaje contextualizado</div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">
+      Los hiperparámetros que tú controlas
+    </div>
+    <div class="grid g2" style="max-width:700px">
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <div class="card-tag" style="color:var(--amber)">Vectorizador TF-IDF</div>
+        <div class="card-body" style="font-family:var(--mono);font-size:12px;line-height:2">
+          <strong>max_features</strong> → vocabulario máximo<br>
+          <strong>ngram_range</strong> → unigramas o bigramas<br>
+          <em style="color:var(--ink3);font-style:normal">Afecta: qué tan rico es el vocabulario del modelo</em>
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--purple)">
+        <div class="card-tag" style="color:var(--purple)">Random Forest</div>
+        <div class="card-body" style="font-family:var(--mono);font-size:12px;line-height:2">
+          <strong>n_estimators</strong> → número de árboles<br>
+          <strong>max_depth</strong> → profundidad del árbol<br>
+          <strong>min_samples_leaf</strong> → regularización<br>
+          <em style="color:var(--ink3);font-style:normal">Afecta: sobreajuste, velocidad, precisión</em>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 05 · 4 ETAPAS ════════════════════════════════════ -->
+<section class="sec" id="s-phases">
+  <p class="eyebrow">// 05 · plan de desarrollo</p>
+  <h2 class="h2">4 etapas hacia el producto final</h2>
+  <p class="lead">
+    Cada etapa es un módulo Python funcional que
+    se construye sobre el anterior. Al final de la
+    Etapa 4 tienes una aplicación completa.
+  </p>
+
+  <div class="phases">
+    <div class="phase current">
+      <div class="phase-num">1</div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <span class="phase-tag">AHORA · Esta sesión</span>
+          <span class="phase-title">Dataset y Modelo Base</span>
+        </div>
+        <div class="phase-desc">
+          Crear el dataset de 180 frases en español etiquetadas
+          con 6 emociones. Preprocesar texto. Entrenar el primer
+          RandomForestClassifier. Visualizar métricas y la matriz
+          de confusión 6×6. Guardar el modelo con joblib.
+        </div>
+        <div class="phase-deliverables">
+          <span class="deliv">01_dataset_modelo_base.py</span>
+          <span class="deliv">modelos/vectorizador.pkl</span>
+          <span class="deliv">modelos/modelo_emosense.pkl</span>
+          <span class="deliv">graficas/matriz_confusion.png</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">2</div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <span class="phase-tag">Siguiente sesión</span>
+          <span class="phase-title">Optimización de Hiperparámetros</span>
+        </div>
+        <div class="phase-desc">
+          Comparar 6 configuraciones de hiperparámetros (TF-IDF +
+          Random Forest). Usar cross-validation para evaluar cada
+          una. Identificar sobreajuste por emoción. Elegir la
+          configuración óptima para el dataset de emociones.
+        </div>
+        <div class="phase-deliverables">
+          <span class="deliv">02_optimizacion.py</span>
+          <span class="deliv">graficas/comparacion_configs.png</span>
+          <span class="deliv">modelos/modelo_optimo.pkl</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">3</div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <span class="phase-tag">Sesión 3</span>
+          <span class="phase-title">Interfaz de Chat con tkinter</span>
+        </div>
+        <div class="phase-desc">
+          Construir la ventana de chat con tkinter. Conectar
+          el modelo guardado. Mostrar barra de confianza por emoción.
+          Programar respuestas empáticas por cada clase.
+          Diseñar la UI con colores por emoción.
+        </div>
+        <div class="phase-deliverables">
+          <span class="deliv">03_chat_tkinter.py</span>
+          <span class="deliv">respuestas/empaticas.py</span>
+        </div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">4</div>
+      <div class="phase-content">
+        <div class="phase-header">
+          <span class="phase-tag">Entrega final</span>
+          <span class="phase-title">Integración y Aplicación Completa</span>
+        </div>
+        <div class="phase-desc">
+          Unir todos los módulos. Agregar historial de emociones
+          por sesión. Generar reporte al cierre. Documentar el
+          proyecto. Presentación final con demostración en vivo.
+        </div>
+        <div class="phase-deliverables">
+          <span class="deliv">04_emosense_app.py</span>
+          <span class="deliv">reporte_sesion.txt</span>
+          <span class="deliv">documentacion.pdf</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 06 · CONEXIÓN CURRICULAR ═════════════════════════ -->
+<section class="sec warm" id="s-connect">
+  <p class="eyebrow">// 06 · conexión curricular</p>
+  <h2 class="h2">Cómo encaja en ambas materias</h2>
+  <p class="lead">
+    EmoSense no es un proyecto de una sola materia.
+    Requiere las dos. El modelo es inútil sin parámetros
+    bien configurados. Los parámetros no significan nada
+    sin un modelo real que evaluar.
+  </p>
+
+  <div class="module-map">
+    <div class="mod-card">
+      <div class="mod-tag">Materia 1</div>
+      <div class="mod-title">Construye Modelos con IA</div>
+      <ul class="mod-items">
+        <li>Diseñar el dataset de emociones</li>
+        <li>Implementar el pipeline completo</li>
+        <li>Construir la interfaz de chat</li>
+        <li>Integrar modelo + UI + respuestas</li>
+        <li>Crear la aplicación final funcional</li>
+      </ul>
+    </div>
+    <div class="mod-divider"><span>+</span></div>
+    <div class="mod-card">
+      <div class="mod-tag">Materia 2</div>
+      <div class="mod-title">Configura Parámetros Operativos</div>
+      <ul class="mod-items">
+        <li>Ajustar TF-IDF (vocabulario, n-gramas)</li>
+        <li>Configurar Random Forest por emoción</li>
+        <li>Comparar 6+ configuraciones</li>
+        <li>Analizar sobreajuste por clase emocional</li>
+        <li>Elegir configuración óptima con métricas</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout ci" data-i="📐" style="max-width:700px;margin-top:16px">
+    <strong>Métricas multiclase:</strong>
+    En la materia de Configura Parámetros vimos métricas
+    binarias (2 clases). EmoSense eleva la complejidad:
+    6 clases, matriz 6×6, F1 por emoción. La misma lógica,
+    mayor sofisticación. Eso conecta ambos módulos de forma natural.
+  </div>
+</section>
+
+
+<!-- ══ 07 · ETAPA 1 EN DETALLE ══════════════════════════ -->
+<section class="sec" id="s-stage1">
+  <p class="eyebrow">// 07 · lo que hacemos HOY</p>
+  <h2 class="h2">Etapa 1 en detalle</h2>
+  <p class="lead">
+    El archivo <strong>01_dataset_modelo_base.py</strong>
+    construye el corazón del proyecto. Todo lo que viene
+    después depende de este módulo.
+  </p>
+
+  <div class="timeline">
+    <div class="tl-item current">
+      <div class="tl-header">
+        <span class="tl-tag">Módulo 1.1</span>
+        <span class="tl-title">Dataset de 180 frases</span>
+      </div>
+      <div class="tl-body">
+        30 frases × 6 emociones = 180 muestras.
+        Todas en español, etiquetadas manualmente.
+        Estas son los datos de entrenamiento.
+        El modelo aprende de ellas.
+      </div>
+    </div>
+    <div class="tl-item current">
+      <div class="tl-header">
+        <span class="tl-tag">Módulo 1.2</span>
+        <span class="tl-title">Limpieza y vectorización TF-IDF</span>
+      </div>
+      <div class="tl-body">
+        Convertir texto a números con TF-IDF.
+        <code style="font-family:var(--mono);font-size:12px;background:var(--amber-l);padding:1px 5px">max_features</code> y
+        <code style="font-family:var(--mono);font-size:12px;background:var(--amber-l);padding:1px 5px">ngram_range</code>
+        son los primeros hiperparámetros a explorar.
+      </div>
+    </div>
+    <div class="tl-item current">
+      <div class="tl-header">
+        <span class="tl-tag">Módulo 1.3</span>
+        <span class="tl-title">Entrenamiento del modelo</span>
+      </div>
+      <div class="tl-body">
+        RandomForestClassifier con hiperparámetros
+        configurables al inicio del archivo. División
+        80/20 con <code style="font-family:var(--mono);font-size:12px;background:var(--amber-l);padding:1px 5px">stratify=True</code>
+        para asegurar que cada emoción aparezca en ambas particiones.
+      </div>
+    </div>
+    <div class="tl-item current">
+      <div class="tl-header">
+        <span class="tl-tag">Módulo 1.4</span>
+        <span class="tl-title">Métricas y visualización</span>
+      </div>
+      <div class="tl-body">
+        Accuracy, Precision, Recall y F1 globales
+        (weighted). Reporte por emoción. Matriz de
+        confusión 6×6 con matplotlib. Gráfica de
+        F1 por emoción con colores.
+      </div>
+    </div>
+    <div class="tl-item current">
+      <div class="tl-header">
+        <span class="tl-tag">Módulo 1.5</span>
+        <span class="tl-title">Guardar el modelo</span>
+      </div>
+      <div class="tl-body">
+        Guardar vectorizador y modelo con
+        <code style="font-family:var(--mono);font-size:12px;background:var(--amber-l);padding:1px 5px">joblib</code>.
+        Estos archivos .pkl son la entrada de las
+        Etapas 2, 3 y 4. Sin ellos no hay app.
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">
+      Vista previa del código (fragmento)
+    </div>
+    <div class="code-wrap">
+      <div class="code-bar">
+        <div class="code-dots">
+          <span class="dot-r"></span>
+          <span class="dot-y"></span>
+          <span class="dot-g"></span>
+        </div>
+        <div class="code-fname">
+          01_dataset_modelo_base.py — ZONA DE CONFIG
+        </div>
+      </div>
+      <div class="code-body">
+<span class="cc"># ═══ ZONA DE CONFIGURACIÓN — HIPERPARÁMETROS ═══</span>
+<span class="cc"># Modifica estos valores para experimentar</span>
+
+<span class="cc"># ── Vectorizador TF-IDF ──────────────────────</span>
+<span class="cn">MAX_FEATURES</span>   = <span class="cn">500</span>    <span class="cc"># vocab máximo</span>
+<span class="cn">NGRAM_RANGE</span>    = (<span class="cn">1</span>, <span class="cn">2</span>)  <span class="cc"># uni + bigramas</span>
+
+<span class="cc"># ── Random Forest ────────────────────────────</span>
+<span class="cn">N_ESTIMATORS</span>   = <span class="cn">100</span>    <span class="cc"># número de árboles</span>
+<span class="cn">MAX_DEPTH</span>      = <span class="ck">None</span>   <span class="cc"># None = sin límite</span>
+<span class="cn">MIN_SMPL_LEAF</span>  = <span class="cn">1</span>      <span class="cc"># hojas mínimas</span>
+
+<span class="cc"># ── División del dataset ─────────────────────</span>
+<span class="cn">TEST_SIZE</span>      = <span class="cn">0.20</span>   <span class="cc"># 20% prueba</span>
+<span class="cn">RANDOM_STATE</span>   = <span class="cn">42</span>     <span class="cc"># semilla</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ 08 · ARCHIVOS ════════════════════════════════════ -->
+<section class="sec warm" id="s-files">
+  <p class="eyebrow">// 08 · estructura de archivos</p>
+  <h2 class="h2">Organización del proyecto</h2>
+  <p class="lead">
+    Crea esta estructura de carpetas en tu computadora
+    antes de empezar. El archivo resaltado en dorado
+    es el que construimos en la Etapa 1.
+  </p>
+
+  <div class="file-tree">
+<span class="ft-dir">emosense_proyecto/</span><br>
+│<br>
+├── <span class="ft-active ft-py">01_dataset_modelo_base.py</span>   <span class="cc">← HOY</span><br>
+├── <span class="ft-done ft-py">02_optimizacion.py</span>           <span class="cc">← Etapa 2</span><br>
+├── <span class="ft-done ft-py">03_chat_tkinter.py</span>           <span class="cc">← Etapa 3</span><br>
+├── <span class="ft-done ft-py">04_emosense_app.py</span>           <span class="cc">← Etapa 4</span><br>
+│<br>
+├── <span class="ft-dir">modelos/</span>                     <span class="cc">← se crea automáticamente</span><br>
+│   ├── <span class="ft-pkl">vectorizador.pkl</span>         <span class="cc">← TF-IDF guardado</span><br>
+│   ├── <span class="ft-pkl">modelo_emosense.pkl</span>      <span class="cc">← RF guardado</span><br>
+│   └── <span class="ft-pkl">modelo_optimo.pkl</span>        <span class="cc">← Etapa 2</span><br>
+│<br>
+└── <span class="ft-dir">graficas/</span>                    <span class="cc">← se crea automáticamente</span><br>
+    ├── <span class="ft-png">matriz_confusion.png</span>     <span class="cc">← Etapa 1</span><br>
+    ├── <span class="ft-png">f1_por_emocion.png</span>       <span class="cc">← Etapa 1</span><br>
+    └── <span class="ft-png">comparacion_configs.png</span>  <span class="cc">← Etapa 2</span>
+  </div>
+
+  <div class="callout ca" data-i="📌" style="max-width:660px;margin-top:16px">
+    <strong>Importante:</strong>
+    Guarda todos los archivos .py en la misma carpeta
+    raíz. Las subcarpetas <code style="font-family:var(--mono)">modelos/</code>
+    y <code style="font-family:var(--mono)">graficas/</code>
+    las crea automáticamente el código con
+    <code style="font-family:var(--mono)">os.makedirs()</code>.
+    No las crees manualmente.
+  </div>
+</section>
+
+
+<!-- ══ 09 · RÚBRICA ════════════════════════════════════ -->
+<section class="sec" id="s-rubric">
+  <p class="eyebrow">// 09 · evaluación del proyecto</p>
+  <h2 class="h2">Rúbrica de evaluación por etapa</h2>
+  <p class="lead">
+    El proyecto se evalúa en 4 etapas acumulativas.
+    Cada etapa suma al total del proyecto final.
+  </p>
+
+  <table class="rubric">
+    <thead>
+      <tr>
+        <th>Etapa</th>
+        <th>Criterio principal</th>
+        <th>Funciona</th>
+        <th>Bien hecho</th>
+        <th>Analizado</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Etapa 1</strong><br><small style="color:var(--ink3)">Dataset + Modelo</small></td>
+        <td>Código ejecuta, modelo entrena, métricas y gráficas generadas</td>
+        <td class="pts">10</td>
+        <td class="pts">10</td>
+        <td class="pts">5</td>
+        <td class="pts">/25</td>
+      </tr>
+      <tr>
+        <td><strong>Etapa 2</strong><br><small style="color:var(--ink3)">Hiperparámetros</small></td>
+        <td>Al menos 5 configs comparadas, análisis escrito del sobreajuste</td>
+        <td class="pts">8</td>
+        <td class="pts">10</td>
+        <td class="pts">7</td>
+        <td class="pts">/25</td>
+      </tr>
+      <tr>
+        <td><strong>Etapa 3</strong><br><small style="color:var(--ink3)">Chat tkinter</small></td>
+        <td>Ventana funcional, detecta emoción, responde con empatía</td>
+        <td class="pts">10</td>
+        <td class="pts">8</td>
+        <td class="pts">7</td>
+        <td class="pts">/25</td>
+      </tr>
+      <tr>
+        <td><strong>Etapa 4</strong><br><small style="color:var(--ink3)">App completa</small></td>
+        <td>Integración funcional + presentación + reflexión escrita</td>
+        <td class="pts">8</td>
+        <td class="pts">10</td>
+        <td class="pts">7</td>
+        <td class="pts">/25</td>
+      </tr>
+      <tr style="background:var(--amber-l)">
+        <td colspan="5" style="text-align:right;font-weight:600;padding-right:20px">TOTAL DEL PROYECTO</td>
+        <td class="pts" style="font-size:18px">/100</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:10px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <span>EmoSense · Propuesta Ejecutiva v1.0 · Módulo III · Técnico en IA</span>
+    <span>Ctrl+P para imprimir este documento</span>
+  </div>
+</section>
+
+</main>
+
+<script>
+window.addEventListener('scroll', () => {
+  const p = document.getElementById('prog');
+  const t = window.scrollY;
+  const h = document.body.scrollHeight - window.innerHeight;
+  p.style.width = (t / h * 100) + '%';
+
+  const secs = document.querySelectorAll('[id^="s-"]');
+  const items = document.querySelectorAll('.sb-item');
+  secs.forEach((s, i) => {
+    const r = s.getBoundingClientRect();
+    if (r.top <= window.innerHeight / 2 && r.bottom > 0) {
+      items.forEach(n => n.classList.remove('active'));
+      const match = document.querySelector(
+        `.sb-item[href="#${s.id}"]`
+      );
+      if (match) match.classList.add('active');
+    }
+  });
+});
+</script>
+</body>
+</html>
