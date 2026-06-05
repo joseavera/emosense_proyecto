@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte de Práctica — EmoSense Módulo 1</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ════════════════════════════════════════════════
+   ESTILOS ADICIONALES PARA REPORTE DE PRÁCTICA
+════════════════════════════════════════════════ */
+
+/* ── SECCIÓN DE REPORTE ─────────────────────── */
+.rep-section {
+  margin-bottom: 32px;
+}
+
+.rep-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border2);
+}
+
+.rep-title .rt-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+  letter-spacing: .1em;
+  flex-shrink: 0;
+}
+
+.rep-title h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: .02em;
+}
+
+/* ── TABLA DE REPORTE ───────────────────────── */
+.rep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 14px 0;
+}
+
+.rep-table thead tr {
+  background: var(--bg3);
+}
+
+.rep-table th {
+  border: 1px solid var(--border2);
+  padding: 9px 13px;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.rep-table td {
+  border: 1px solid var(--border);
+  padding: 9px 13px;
+  color: var(--text2);
+  vertical-align: middle;
+}
+
+.rep-table tr:hover td {
+  background: var(--bg3);
+}
+
+.rep-table td.fill {
+  background: var(--bg);
+  border: 1px dashed var(--border2);
+}
+
+.rep-table td.fill input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  text-align: center;
+}
+
+.rep-table td.fill input::placeholder {
+  color: var(--border2);
+  font-size: 11px;
+}
+
+.rep-table td.label-cell {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rep-table td.hiperparam {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cyan);
+}
+
+.rep-table td.tipo-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.tag-tfidf {
+  color: var(--cyan);
+  background: var(--cyan-bg);
+  border: 1px solid var(--cyan);
+  border-radius: 99px;
+  padding: 2px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.tag-rf {
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  border-radius: 99px;
+  padding: 2px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.tag-div {
+  color: var(--green);
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  border-radius: 99px;
+  padding: 2px 8px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* ── ÁREA DE TEXTO ──────────────────────────── */
+.rep-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  line-height: 1.7;
+  transition: border-color var(--transition),
+              box-shadow var(--transition);
+  min-height: 90px;
+}
+
+.rep-textarea:focus {
+  border-color: var(--accent);
+  border-style: solid;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.rep-textarea::placeholder {
+  color: var(--border2);
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* ── ETIQUETA DE CAMPO ──────────────────────── */
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 7px;
+  display: block;
+}
+
+.field-wrap {
+  margin-bottom: 18px;
+}
+
+/* ── ANÁLISIS GRID ──────────────────────────── */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── CONCLUSIÓN CARD ────────────────────────── */
+.concl-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+}
+
+.concl-card .cc-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+/* ── FIRMA ──────────────────────────────────── */
+.firma-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.firma-item {
+  text-align: center;
+}
+
+.firma-line {
+  height: 1px;
+  background: var(--border2);
+  margin-bottom: 8px;
+}
+
+.firma-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* ── HALLAZGO RÁPIDO ────────────────────────── */
+.hallazgo-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px 16px;
+  margin-bottom: 10px;
+}
+
+.hall-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hall-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.hall-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--border2);
+  outline: none;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  padding: 3px 0;
+  transition: border-color var(--transition);
+}
+
+.hall-input:focus {
+  border-bottom-color: var(--accent);
+}
+
+.hall-input::placeholder {
+  color: var(--border2);
+  font-size: 11px;
+}
+
+/* ── BARRA DE EMOCIÓN ───────────────────────── */
+.emo-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.emo-bar-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 80px;
+  align-items: center;
+  gap: 10px;
+}
+
+.emo-bar-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.emo-bar-track {
+  height: 8px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: visible;
+  position: relative;
+}
+
+.emo-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+
+.emo-bar-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: right;
+}
+
+.emo-bar-val input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--border2);
+  outline: none;
+  width: 70px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cyan);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.emo-bar-val input:focus {
+  border-bottom-color: var(--accent);
+}
+
+/* ── MATRIZ VISUAL ──────────────────────────── */
+.matrix-6x6 {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  margin: 14px 0;
+}
+
+.matrix-6x6 th {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  padding: 7px 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text2);
+  text-align: center;
+  letter-spacing: .05em;
+}
+
+.matrix-6x6 th.corner {
+  background: var(--bg);
+}
+
+.matrix-6x6 td.row-head {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  padding: 7px 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text2);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.matrix-6x6 td.m-cell {
+  border: 1px solid var(--border);
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.matrix-6x6 td.m-cell input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text2);
+  text-align: center;
+  min-width: 36px;
+}
+
+.matrix-6x6 td.m-cell.diagonal {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.matrix-6x6 td.m-cell.diagonal input {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── MINI NOTA ──────────────────────────────── */
+.mini-note {
+  font-size: 12px;
+  color: var(--text2);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.mini-note strong { color: var(--text); }
+
+/* ── BOTÓN DE IMPRIMIR ──────────────────────── */
+.print-btn-wrap {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 500;
+}
+
+/* ── PRINT ──────────────────────────────────── */
+@media print {
+  .print-btn-wrap { display: none !important; }
+  .rep-textarea {
+    border: 1px solid #ccc;
+    min-height: 70px;
+  }
+  .rep-table td.fill {
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+  .analysis-grid,
+  .firma-grid { break-inside: avoid; }
+  .rep-section { break-inside: avoid; }
+  .matrix-6x6 td.m-cell.diagonal {
+    background: #e8e8f8 !important;
+  }
+  #topbar { display: none !important; }
+}
+
+/* ── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 680px) {
+  .analysis-grid,
+  .firma-grid { grid-template-columns: 1fr; }
+  .emo-bar-row {
+    grid-template-columns: 70px 1fr 60px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ════════════════════════════════════════════ -->
+<div id="topbar">
+  <div class="tb-left">
+    <span class="tb-materia">EmoSense</span>
+    <span class="tb-semestre">
+      Reporte de Práctica · Módulo 1
+    </span>
+  </div>
+  <div class="tb-right">
+    <button id="theme-toggle"
+            onclick="toggleTheme()"
+            title="Cambiar tema">🌙</button>
+  </div>
+</div>
+
+<!-- ══ BOTÓN IMPRIMIR ════════════════════════════════════ -->
+<div class="print-btn-wrap">
+  <button class="btn btn-primary"
+          onclick="window.print()">
+    🖨 Imprimir / Guardar PDF
+  </button>
+</div>
+
+<!-- ══ CONTENEDOR ════════════════════════════════════════ -->
+<div class="container">
+
+  <!-- ENCABEZADO ─────────────────────────────────────── -->
+  <div class="eval-header">
+    <div class="eval-tag">Práctica de Laboratorio</div>
+    <h1>Reporte de Práctica<br>EmoSense — Módulo 1</h1>
+    <div class="eval-sub">
+      Construcción del Dataset y Modelo Base de
+      Clasificación de Emociones con IA
+    </div>
+    <div class="eval-meta">
+      <span>📁 01_dataset_modelo_base.py</span>
+      <span>🧠 Random Forest · TF-IDF</span>
+      <span>😊😢😡😨😲🤢  6 emociones</span>
+      <span>📊 180 muestras</span>
+    </div>
+  </div>
+
+  <!-- DATOS DEL ALUMNO ────────────────────────────────── -->
+  <div class="student-card">
+    <div class="sc-title">Datos del alumno</div>
+    <div class="sc-grid">
+      <div class="sc-field">
+        <label>Nombre completo</label>
+        <input type="text"
+               placeholder="Escribe tu nombre completo">
+      </div>
+      <div class="sc-field">
+        <label>Matrícula / N.° de control</label>
+        <input type="text" placeholder="000000">
+      </div>
+      <div class="sc-field">
+        <label>Grupo</label>
+        <input type="text" placeholder="Ej: LSC-2B">
+      </div>
+      <div class="sc-field">
+        <label>Fecha de ejecución</label>
+        <input type="text" id="fecha-ejecucion"
+               placeholder="DD / MM / AAAA">
+      </div>
+      <div class="sc-field">
+        <label>Carrera</label>
+        <input type="text"
+               placeholder="Ej: Licenciatura en Sistemas">
+      </div>
+      <div class="sc-field">
+        <label>Docente</label>
+        <input type="text"
+               placeholder="Nombre del docente">
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       I. OBJETIVO
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">I</span>
+      <h2>Objetivo de la práctica</h2>
+    </div>
+
+    <div class="context-box">
+      <div class="ctx-title">Objetivo general</div>
+      <p>
+        Construir el primer modelo funcional del sistema
+        <strong>EmoSense</strong> — un clasificador de inteligencia
+        emocional en Python — mediante la creación de un dataset de
+        frases en español, su vectorización con TF-IDF, el
+        entrenamiento de un Random Forest y la evaluación de
+        métricas de desempeño (Accuracy, Precision, Recall, F1).
+      </p>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        Objetivo específico personal
+        (escribe con tus propias palabras qué querías lograr)
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="Ej: Quería entender cómo un modelo de machine learning puede aprender a reconocer emociones a partir de texto, y observar cómo los hiperparámetros afectan el rendimiento..."></textarea>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       II. MARCO TEÓRICO
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">II</span>
+      <h2>Marco teórico y conceptos clave</h2>
+    </div>
+
+    <div class="analysis-grid">
+
+      <div class="field-wrap">
+        <label class="field-label">
+          ¿Qué son las 6 emociones de Ekman y por qué se usan
+          como clases de clasificación?
+        </label>
+        <textarea class="rep-textarea"
+          placeholder="Paul Ekman (1972) identificó 6 emociones básicas universales que se expresan en todas las culturas del mundo: alegría, tristeza, enojo, miedo, sorpresa y asco. Son universales porque..."></textarea>
+      </div>
+
+      <div class="field-wrap">
+        <label class="field-label">
+          ¿Qué es TF-IDF y cómo convierte texto en números
+          que el modelo puede procesar?
+        </label>
+        <textarea class="rep-textarea"
+          placeholder="TF-IDF (Term Frequency - Inverse Document Frequency) es una técnica de vectorización que... Asigna un peso a cada palabra según..."></textarea>
+      </div>
+
+      <div class="field-wrap">
+        <label class="field-label">
+          ¿Qué es un Random Forest y cómo clasifica
+          una frase de texto?
+        </label>
+        <textarea class="rep-textarea"
+          placeholder="Random Forest es un conjunto (ensemble) de árboles de decisión que... Cada árbol vota y la emoción con más votos es..."></textarea>
+      </div>
+
+      <div class="field-wrap">
+        <label class="field-label">
+          Diferencia entre parámetros e hiperparámetros
+          en este modelo
+        </label>
+        <textarea class="rep-textarea"
+          placeholder="Parámetros: valores que el modelo aprende durante el entrenamiento, como los pesos TF-IDF de cada palabra... Hiperparámetros: valores que el programador configura antes, como n_estimators o max_depth..."></textarea>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       III. HERRAMIENTAS
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">III</span>
+      <h2>Herramientas y tecnologías utilizadas</h2>
+    </div>
+
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Herramienta / Librería</th>
+          <th>Versión utilizada</th>
+          <th>Función en el proyecto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">Python</td>
+          <td class="fill">
+            <input type="text" placeholder="3.x.x">
+          </td>
+          <td>Lenguaje de programación principal</td>
+        </tr>
+        <tr>
+          <td class="label-cell">IDLE</td>
+          <td class="fill">
+            <input type="text" placeholder="incluido">
+          </td>
+          <td>Entorno de desarrollo integrado</td>
+        </tr>
+        <tr>
+          <td class="label-cell">scikit-learn</td>
+          <td class="fill">
+            <input type="text" placeholder="x.x.x">
+          </td>
+          <td>TF-IDF, RandomForest, métricas</td>
+        </tr>
+        <tr>
+          <td class="label-cell">matplotlib</td>
+          <td class="fill">
+            <input type="text" placeholder="x.x.x">
+          </td>
+          <td>Visualización de gráficas y matriz</td>
+        </tr>
+        <tr>
+          <td class="label-cell">numpy</td>
+          <td class="fill">
+            <input type="text" placeholder="x.x.x">
+          </td>
+          <td>Operaciones numéricas con arrays</td>
+        </tr>
+        <tr>
+          <td class="label-cell">joblib</td>
+          <td class="fill">
+            <input type="text" placeholder="x.x.x">
+          </td>
+          <td>Guardar y cargar el modelo .pkl</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="mini-note">
+      Para ver las versiones instaladas ejecuta en IDLE:
+      <code class="code-block" style="display:inline;padding:2px 8px;font-size:12px">
+        import sklearn; print(sklearn.__version__)
+      </code>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       IV. DESCRIPCIÓN DEL DATASET
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">IV</span>
+      <h2>Descripción del dataset construido</h2>
+    </div>
+
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Emoción</th>
+          <th>Emoji</th>
+          <th>Frases en el dataset</th>
+          <th>% del total</th>
+          <th>Ejemplo de frase</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">Alegría</td>
+          <td style="text-align:center">😊</td>
+          <td class="fill">
+            <input type="text" placeholder="30">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="16.7%">
+          </td>
+          <td class="fill" style="min-width:160px">
+            <input type="text"
+              placeholder="Escribe un ejemplo...">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Tristeza</td>
+          <td style="text-align:center">😢</td>
+          <td class="fill">
+            <input type="text" placeholder="30">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="16.7%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Enojo</td>
+          <td style="text-align:center">😡</td>
+          <td class="fill">
+            <input type="text" placeholder="30">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="16.7%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Miedo</td>
+          <td style="text-align:center">😨</td>
+          <td class="fill">
+            <input type="text" placeholder="30">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="16.7%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Sorpresa</td>
+          <td style="text-align:center">😲</td>
+          <td class="fill">
+            <input type="text" placeholder="30">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="16.7%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Asco</td>
+          <td style="text-align:center">🤢</td>
+          <td class="fill">
+            <input type="text" placeholder="30">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="16.7%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr style="background:var(--bg3)">
+          <td class="label-cell"
+              style="color:var(--accent)">
+            TOTAL
+          </td>
+          <td style="text-align:center">—</td>
+          <td class="fill">
+            <input type="text" placeholder="180">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="100%">
+          </td>
+          <td style="color:var(--text2);font-size:12px">
+            Dataset balanceado
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="field-wrap" style="margin-top:16px">
+      <label class="field-label">
+        División entrenamiento / prueba obtenida
+      </label>
+      <div style="display:grid;
+                  grid-template-columns:1fr 1fr 1fr;
+                  gap:12px">
+        <div class="hallazgo-row">
+          <span class="hall-icon">📚</span>
+          <div style="flex:1">
+            <div class="hall-label">Entrenamiento (80%)</div>
+            <input class="hall-input" type="text"
+                   placeholder="___ muestras">
+          </div>
+        </div>
+        <div class="hallazgo-row">
+          <span class="hall-icon">📝</span>
+          <div style="flex:1">
+            <div class="hall-label">Prueba (20%)</div>
+            <input class="hall-input" type="text"
+                   placeholder="___ muestras">
+          </div>
+        </div>
+        <div class="hallazgo-row">
+          <span class="hall-icon">📐</span>
+          <div style="flex:1">
+            <div class="hall-label">Vocabulario TF-IDF</div>
+            <input class="hall-input" type="text"
+                   placeholder="___ palabras">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       V. CONFIGURACIÓN DE HIPERPARÁMETROS
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">V</span>
+      <h2>Configuración de hiperparámetros</h2>
+    </div>
+
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Hiperparámetro</th>
+          <th>Valor usado</th>
+          <th>Tipo</th>
+          <th>¿Qué controla?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hiperparam">MAX_FEATURES</td>
+          <td class="fill">
+            <input type="text" placeholder="500">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-tfidf">TF-IDF</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Tamaño máximo del vocabulario
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">NGRAM_RANGE</td>
+          <td class="fill">
+            <input type="text" placeholder="(1, 2)">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-tfidf">TF-IDF</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Uni y bigramas de palabras
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">N_ESTIMATORS</td>
+          <td class="fill">
+            <input type="text" placeholder="100">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-rf">Random Forest</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Número de árboles en el bosque
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">MAX_DEPTH</td>
+          <td class="fill">
+            <input type="text" placeholder="None">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-rf">Random Forest</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Profundidad máxima del árbol
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">MIN_SMPL_LEAF</td>
+          <td class="fill">
+            <input type="text" placeholder="1">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-rf">Random Forest</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Mínimo de muestras por hoja
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">TEST_SIZE</td>
+          <td class="fill">
+            <input type="text" placeholder="0.20">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-div">División</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Porcentaje reservado para prueba
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">RANDOM_STATE</td>
+          <td class="fill">
+            <input type="text" placeholder="42">
+          </td>
+          <td class="tipo-tag">
+            <span class="tag-div">División</span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Semilla de aleatoriedad
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       VI. RESULTADOS
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">VI</span>
+      <h2>Resultados obtenidos</h2>
+    </div>
+
+    <!-- 6A. Métricas globales -->
+    <div class="section-title">6A · Métricas globales del modelo</div>
+
+    <div style="display:grid;
+                grid-template-columns:repeat(4,1fr);
+                gap:10px;margin:14px 0 20px">
+      <div class="hallazgo-row"
+           style="flex-direction:column;gap:6px">
+        <div class="hall-label">Accuracy</div>
+        <input class="hall-input" type="text"
+               placeholder="0.0000"
+               style="font-size:18px;text-align:center;
+                      padding:4px 0">
+        <div style="font-size:11px;color:var(--text2)">
+          (TP+TN) / total
+        </div>
+      </div>
+      <div class="hallazgo-row"
+           style="flex-direction:column;gap:6px">
+        <div class="hall-label">Precision</div>
+        <input class="hall-input" type="text"
+               placeholder="0.0000"
+               style="font-size:18px;text-align:center;
+                      padding:4px 0">
+        <div style="font-size:11px;color:var(--text2)">
+          TP / (TP + FP)
+        </div>
+      </div>
+      <div class="hallazgo-row"
+           style="flex-direction:column;gap:6px">
+        <div class="hall-label">Recall</div>
+        <input class="hall-input" type="text"
+               placeholder="0.0000"
+               style="font-size:18px;text-align:center;
+                      padding:4px 0">
+        <div style="font-size:11px;color:var(--text2)">
+          TP / (TP + FN)
+        </div>
+      </div>
+      <div class="hallazgo-row"
+           style="flex-direction:column;gap:6px">
+        <div class="hall-label">F1-Score</div>
+        <input class="hall-input" type="text"
+               placeholder="0.0000"
+               style="font-size:18px;text-align:center;
+                      padding:4px 0">
+        <div style="font-size:11px;color:var(--text2)">
+          2·(P·R)/(P+R)
+        </div>
+      </div>
+    </div>
+
+    <!-- 6B. Métricas por emoción -->
+    <div class="section-title">
+      6B · Métricas por emoción (del classification report)
+    </div>
+
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Emoción</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>F1-Score</th>
+          <th>Support</th>
+          <th>Observación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">😊 Alegría</td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td class="fill" style="min-width:120px">
+            <input type="text"
+              placeholder="¿Alta, media, baja?">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">😢 Tristeza</td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">😡 Enojo</td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">😨 Miedo</td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">😲 Sorpresa</td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">🤢 Asco</td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="">
+          </td>
+        </tr>
+        <tr style="background:var(--bg3)">
+          <td class="label-cell"
+              style="color:var(--accent)">
+            Macro avg
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="0.00">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="—">
+          </td>
+          <td style="color:var(--text2);font-size:12px">
+            Promedio sin pesos
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 6C. Barras de F1 por emoción -->
+    <div class="section-title">
+      6C · F1-Score por emoción (visualización)
+    </div>
+    <div class="mini-note">
+      Escribe el valor de F1 de cada emoción.
+      La barra se dibuja automáticamente.
+    </div>
+
+    <div class="emo-bar-wrap" id="emoBarWrap">
+      <div class="emo-bar-row">
+        <div class="emo-bar-label">😊 Alegría</div>
+        <div class="emo-bar-track">
+          <div class="emo-bar-fill"
+               id="bar-alegria"
+               style="width:0%;background:#d97706"></div>
+        </div>
+        <div class="emo-bar-val">
+          <input type="number" min="0" max="1"
+                 step="0.01" placeholder="0.00"
+                 oninput="updateBar('alegria',this.value)">
+        </div>
+      </div>
+      <div class="emo-bar-row">
+        <div class="emo-bar-label">😢 Tristeza</div>
+        <div class="emo-bar-track">
+          <div class="emo-bar-fill"
+               id="bar-tristeza"
+               style="width:0%;background:#1d4ed8"></div>
+        </div>
+        <div class="emo-bar-val">
+          <input type="number" min="0" max="1"
+                 step="0.01" placeholder="0.00"
+                 oninput="updateBar('tristeza',this.value)">
+        </div>
+      </div>
+      <div class="emo-bar-row">
+        <div class="emo-bar-label">😡 Enojo</div>
+        <div class="emo-bar-track">
+          <div class="emo-bar-fill"
+               id="bar-enojo"
+               style="width:0%;background:#b91c1c"></div>
+        </div>
+        <div class="emo-bar-val">
+          <input type="number" min="0" max="1"
+                 step="0.01" placeholder="0.00"
+                 oninput="updateBar('enojo',this.value)">
+        </div>
+      </div>
+      <div class="emo-bar-row">
+        <div class="emo-bar-label">😨 Miedo</div>
+        <div class="emo-bar-track">
+          <div class="emo-bar-fill"
+               id="bar-miedo"
+               style="width:0%;background:#6d28d9"></div>
+        </div>
+        <div class="emo-bar-val">
+          <input type="number" min="0" max="1"
+                 step="0.01" placeholder="0.00"
+                 oninput="updateBar('miedo',this.value)">
+        </div>
+      </div>
+      <div class="emo-bar-row">
+        <div class="emo-bar-label">😲 Sorpresa</div>
+        <div class="emo-bar-track">
+          <div class="emo-bar-fill"
+               id="bar-sorpresa"
+               style="width:0%;background:#0f766e"></div>
+        </div>
+        <div class="emo-bar-val">
+          <input type="number" min="0" max="1"
+                 step="0.01" placeholder="0.00"
+                 oninput="updateBar('sorpresa',this.value)">
+        </div>
+      </div>
+      <div class="emo-bar-row">
+        <div class="emo-bar-label">🤢 Asco</div>
+        <div class="emo-bar-track">
+          <div class="emo-bar-fill"
+               id="bar-asco"
+               style="width:0%;background:#4d7c0f"></div>
+        </div>
+        <div class="emo-bar-val">
+          <input type="number" min="0" max="1"
+                 step="0.01" placeholder="0.00"
+                 oninput="updateBar('asco',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- 6D. Matriz de confusión -->
+    <div class="section-title">
+      6D · Matriz de confusión 6×6
+    </div>
+    <div class="mini-note">
+      Transcribe los valores de la imagen
+      <strong>evaluacion_modelo_base.png</strong>
+      generada por el código.
+      La diagonal (en morado) son los aciertos.
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="matrix-6x6">
+        <thead>
+          <tr>
+            <th class="corner"
+                style="text-align:right;
+                       padding-right:6px;
+                       font-size:9px;
+                       color:var(--text2)">
+              Real ↓ / Pred →
+            </th>
+            <th>😊<br>Alegría</th>
+            <th>😢<br>Tristeza</th>
+            <th>😡<br>Enojo</th>
+            <th>😨<br>Miedo</th>
+            <th>😲<br>Sorpresa</th>
+            <th>🤢<br>Asco</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-head">😊 Alegría</td>
+            <td class="m-cell diagonal">
+              <input type="text" placeholder="TP">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+          </tr>
+          <tr>
+            <td class="row-head">😢 Tristeza</td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell diagonal">
+              <input type="text" placeholder="TP">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+          </tr>
+          <tr>
+            <td class="row-head">😡 Enojo</td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell diagonal">
+              <input type="text" placeholder="TP">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+          </tr>
+          <tr>
+            <td class="row-head">😨 Miedo</td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell diagonal">
+              <input type="text" placeholder="TP">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+          </tr>
+          <tr>
+            <td class="row-head">😲 Sorpresa</td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell diagonal">
+              <input type="text" placeholder="TP">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+          </tr>
+          <tr>
+            <td class="row-head">🤢 Asco</td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell">
+              <input type="text" placeholder="—">
+            </td>
+            <td class="m-cell diagonal">
+              <input type="text" placeholder="TP">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6E. Prueba rápida -->
+    <div class="section-title" style="margin-top:20px">
+      6E · Resultados de la prueba rápida
+    </div>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Frase enviada al modelo</th>
+          <th>Emoción predicha</th>
+          <th>Confianza (%)</th>
+          <th>¿Es correcta?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-style:italic;color:var(--text2);
+                     font-size:12.5px">
+            "Hoy es el mejor día de mi vida"
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="emoción">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="___%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Sí / No">
+          </td>
+        </tr>
+        <tr>
+          <td style="font-style:italic;color:var(--text2);
+                     font-size:12.5px">
+            "Me siento solo y sin energía"
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="emoción">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="___%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Sí / No">
+          </td>
+        </tr>
+        <tr>
+          <td style="font-style:italic;color:var(--text2);
+                     font-size:12.5px">
+            "Estoy furioso por lo que hicieron"
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="emoción">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="___%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Sí / No">
+          </td>
+        </tr>
+        <tr>
+          <td style="font-style:italic;color:var(--text2);
+                     font-size:12.5px">
+            "Tengo mucho miedo de lo que pasará"
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="emoción">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="___%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Sí / No">
+          </td>
+        </tr>
+        <tr>
+          <td style="font-style:italic;color:var(--text2);
+                     font-size:12.5px">
+            "No puedo creer lo que acabo de ver"
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="emoción">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="___%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Sí / No">
+          </td>
+        </tr>
+        <tr>
+          <td style="font-style:italic;color:var(--text2);
+                     font-size:12.5px">
+            "Eso me produce una repulsión total"
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="emoción">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="___%">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Sí / No">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       VII. ANÁLISIS Y DISCUSIÓN
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">VII</span>
+      <h2>Análisis y discusión de resultados</h2>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        7.1 · Emoción con mayor F1 — ¿por qué crees
+        que fue la más fácil de clasificar?
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="La emoción con mayor F1 fue _______  con F1 = _____.
+Creo que fue la más fácil porque sus frases utilizan un vocabulario muy específico como _______, que difícilmente aparece en frases de otras emociones..."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        7.2 · Emoción con menor F1 — ¿con cuál otra
+        emoción la confunde el modelo y por qué?
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="La emoción con menor F1 fue _______ con F1 = _____.
+El modelo la confunde principalmente con _______ porque comparten palabras como _______, que aparecen en ambas clases..."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        7.3 · Interpreta la diferencia entre Precision
+        y Recall para la emoción más difícil
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="Para la emoción _______, la Precision fue _____ y el Recall fue _____.
+Que Precision > Recall significa que... / Que Recall > Precision significa que...
+Esto indica que el modelo..."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        7.4 · Efecto del hiperparámetro MAX_FEATURES=500
+        — ¿qué pasaría si lo cambias a 200 o a 1000?
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="Con MAX_FEATURES=200 el vocabulario sería más pequeño, lo que podría...
+Con MAX_FEATURES=1000 habría más palabras disponibles, pero podría...
+Para el español emocional creo que el valor ideal sería _____ porque..."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        7.5 · Riesgos del modelo base — ¿hay señales
+        de sobreajuste o subajuste? ¿Cómo lo detectas?
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="Para detectar sobreajuste compararía la Accuracy en entrenamiento con la Accuracy en prueba. En este modelo...
+Las señales que observo son...
+Mi conclusión sobre si hay sobreajuste es..."></textarea>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">
+        7.6 · Limitaciones del dataset de 180 frases
+        — ¿qué problemas puede causar este tamaño?
+      </label>
+      <textarea class="rep-textarea"
+        placeholder="Con solo 30 frases por emoción, el modelo puede...
+Las limitaciones más importantes son:
+1. 
+2.
+3.
+Para el Módulo 2 propongo mejorar esto agregando..."></textarea>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       VIII. CONCLUSIONES
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">VIII</span>
+      <h2>Conclusiones</h2>
+    </div>
+
+    <div class="concl-card">
+      <div class="cc-num">Conclusión 1 — Sobre el modelo</div>
+      <textarea class="rep-textarea"
+        style="border:none;background:transparent;
+               padding:0;min-height:72px"
+        placeholder="En esta práctica construí un clasificador que... El resultado más relevante fue... Esto demuestra que..."></textarea>
+    </div>
+
+    <div class="concl-card">
+      <div class="cc-num">
+        Conclusión 2 — Sobre los hiperparámetros
+      </div>
+      <textarea class="rep-textarea"
+        style="border:none;background:transparent;
+               padding:0;min-height:72px"
+        placeholder="Los hiperparámetros que más impactaron el rendimiento fueron... Aprendí que..."></textarea>
+    </div>
+
+    <div class="concl-card">
+      <div class="cc-num">
+        Conclusión 3 — Sobre inteligencia emocional y IA
+      </div>
+      <textarea class="rep-textarea"
+        style="border:none;background:transparent;
+               padding:0;min-height:72px"
+        placeholder="La conexión entre la teoría de inteligencia emocional de Goleman y el modelo de machine learning es... Lo que más me sorprendió fue..."></textarea>
+    </div>
+
+    <div class="concl-card">
+      <div class="cc-num">
+        Conclusión 4 — Próximos pasos (Módulo 2)
+      </div>
+      <textarea class="rep-textarea"
+        style="border:none;background:transparent;
+               padding:0;min-height:72px"
+        placeholder="Para el Módulo 2 planeo modificar los hiperparámetros... Espero que esto mejore el F1 de la emoción _____ porque..."></textarea>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       IX. ARCHIVOS GENERADOS
+  ════════════════════════════════════════════════════ -->
+  <div class="rep-section">
+    <div class="rep-title">
+      <span class="rt-num">IX</span>
+      <h2>Archivos generados y entregables</h2>
+    </div>
+
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Archivo</th>
+          <th>Descripción</th>
+          <th>¿Generado?</th>
+          <th>Observación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hiperparam">
+            01_dataset_modelo_base.py
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Código fuente ejecutado
+          </td>
+          <td class="fill" style="text-align:center">
+            <input type="text" placeholder="✓ / ✗">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Notas...">
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">
+            modelos/vectorizador.pkl
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Vectorizador TF-IDF serializado
+          </td>
+          <td class="fill" style="text-align:center">
+            <input type="text" placeholder="✓ / ✗">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Notas...">
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">
+            modelos/modelo_emosense.pkl
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Clasificador Random Forest serializado
+          </td>
+          <td class="fill" style="text-align:center">
+            <input type="text" placeholder="✓ / ✗">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Notas...">
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">
+            graficas/evaluacion_modelo_base.png
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Imagen: matriz de confusión + barras F1
+          </td>
+          <td class="fill" style="text-align:center">
+            <input type="text" placeholder="✓ / ✗">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Notas...">
+          </td>
+        </tr>
+        <tr>
+          <td class="hiperparam">
+            Reporte de práctica (este documento)
+          </td>
+          <td style="font-size:12.5px;color:var(--text2)">
+            Documento con análisis y conclusiones
+          </td>
+          <td class="fill" style="text-align:center">
+            <input type="text" placeholder="✓ / ✗">
+          </td>
+          <td class="fill">
+            <input type="text" placeholder="Notas...">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════
+       FIRMAS
+  ════════════════════════════════════════════════════ -->
+  <div class="firma-grid">
+    <div class="firma-item">
+      <div class="firma-line"></div>
+      <div class="firma-label">Firma del alumno</div>
+    </div>
+    <div class="firma-item">
+      <div class="firma-line"></div>
+      <div class="firma-label">Firma del docente</div>
+    </div>
+    <div class="firma-item">
+      <div class="firma-line"></div>
+      <div class="firma-label">
+        Calificación / Revisado
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE ─────────────────────────────────────────────── -->
+  <div style="margin-top:32px;
+              padding-top:16px;
+              border-top:1px solid var(--border);
+              display:flex;
+              justify-content:space-between;
+              flex-wrap:wrap;
+              gap:8px">
+    <span style="font-family:var(--font-mono);
+                 font-size:10px;
+                 color:var(--text2);
+                 letter-spacing:.1em">
+      EmoSense · Reporte Práctica Módulo 1 ·
+      Técnico en IA · SEP
+    </span>
+    <span style="font-family:var(--font-mono);
+                 font-size:10px;
+                 color:var(--text2)">
+      Ctrl+P para imprimir o guardar como PDF
+    </span>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ════════════════════════════════════════════════════ -->
+<script>
+/* ── BARRAS DE EMOCIÓN ─────────────────────────────── */
+function updateBar(emo, val) {
+  const bar = document.getElementById('bar-' + emo);
+  if (!bar) return;
+  const pct = Math.min(
+    100, Math.max(0, parseFloat(val) * 100 || 0)
+  );
+  bar.style.width = pct + '%';
+}
+
+/* ── TEMA ──────────────────────────────────────────── */
+function toggleTheme() {
+  const isDark =
+    !document.documentElement
+      .hasAttribute('data-theme');
+  document.documentElement.setAttribute(
+    'data-theme', isDark ? 'light' : ''
+  );
+  document.getElementById('theme-toggle')
+    .textContent = isDark ? '🌙' : '☀️';
+}
+
+/* ── FECHA AUTOMÁTICA ──────────────────────────────── */
+window.addEventListener('load', () => {
+  const f = document.getElementById('fecha-ejecucion');
+  if (f && !f.value) {
+    const d = new Date();
+    f.value = d.toLocaleDateString('es-MX', {
+      day  : '2-digit',
+      month: '2-digit',
+      year : 'numeric',
+    });
+  }
+});
+</script>
+</body>
+</html>
