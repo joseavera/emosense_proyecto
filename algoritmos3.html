@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ AI Lab v4.0: Módulo Completo con Contexto Teórico</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --neon-blue: #38bdf8;
+            --neon-green: #4ade80;
+            --neon-purple: #c084fc;
+            --neon-yellow: #facc15;
+            --neon-red: #f87171;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        /* Bloqueo estricto de selección de texto */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 30px 15px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #1e1b4b, #111827);
+            border: 2px solid var(--neon-blue);
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--neon-purple);
+            font-weight: bold;
+        }
+
+        .timer-badge {
+            display: inline-block;
+            background: rgba(248, 113, 113, 0.2);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            padding: 6px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: var(--card-dark);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: #475569;
+        }
+
+        .card h3 {
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title {
+            color: var(--neon-yellow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 40px 0 20px 0;
+            padding-left: 10px;
+            border-left: 4px solid var(--neon-yellow);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 100%;
+            user-select: text !important;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+        }
+
+        /* --- NUEVO: Caja de Contexto Teórico --- */
+        .context-box {
+            background-color: rgba(192, 132, 252, 0.08);
+            border-left: 4px solid var(--neon-purple);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+        }
+
+        .context-box h4 {
+            color: var(--neon-purple);
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .option-label {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background: #273549;
+            border-color: var(--neon-purple);
+        }
+
+        .option-label input[type="radio"] {
+            accent-color: var(--neon-purple);
+            transform: scale(1.2);
+        }
+
+        .review-box {
+            background-color: rgba(56, 189, 248, 0.08);
+            border-left: 4px solid var(--neon-blue);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .pseint-box {
+            background: #090d16;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .pseint-header {
+            background: #131b2e;
+            padding: 10px 15px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .pseint-code {
+            padding: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .kw { color: #ff79c6; font-weight: bold; } 
+        .st { color: #f1fa8c; } 
+
+        .pseint-actions {
+            background: #131b2e;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-top: 1px solid #334155;
+        }
+
+        .pseint-input-val {
+            background: #0f172a;
+            border: 1px solid #475569;
+            color: var(--neon-blue);
+            padding: 8px;
+            border-radius: 6px;
+            width: 100px;
+            font-family: monospace;
+            font-weight: bold;
+            text-align: center;
+            user-select: text !important;
+        }
+
+        .btn-run {
+            background: var(--neon-green);
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-run:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 12px var(--neon-green);
+        }
+
+        .pseint-output {
+            background: #05070f;
+            border-top: 1px solid #222;
+            padding: 15px;
+            font-family: monospace;
+            color: #a7f3d0;
+            font-size: 0.9rem;
+            min-height: 40px;
+            display: none;
+        }
+
+        #cheat-alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--neon-red);
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(248, 113, 113, 0.4);
+            display: none;
+            z-index: 10000;
+            animation: pop 0.3s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: translateY(20px) scale(0.8); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .btn-submit-exam {
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            color: #fff;
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(192, 132, 252, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-submit-exam:hover {
+            box-shadow: 0 5px 25px rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        #results-area {
+            display: none;
+            margin-top: 40px;
+            border: 2px solid var(--neon-purple);
+            background: #1e1b4b;
+            box-shadow: 0 0 25px rgba(192, 132, 252, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #475569;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-num {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+
+        .stat-box.critical .stat-num { color: var(--neon-red); }
+
+        .btn-print {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn-print:hover { background: #475569; }
+
+        @media print {
+            body { background: white !important; color: #000 !important; padding: 0; }
+            .card, header, #results-area {
+                background: white !important; color: #000 !important;
+                border: 1px solid #000 !important; box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            .context-box { background: #f8fafc !important; color: #000 !important; border-left: 4px solid #94a3b8 !important; }
+            .pseint-box, .pseint-header, .pseint-actions {
+                background: #f1f5f9 !important; color: #000 !important; border: 1px solid #ccc !important;
+            }
+            .kw { color: #000 !important; font-weight: bold; }
+            .st { color: #222 !important; font-style: italic; }
+            .pseint-output { display: block !important; background: #e2e8f0 !important; color: #000 !important; }
+            .btn-run, .btn-submit-exam, .btn-print, .timer-badge, .review-box { display: none !important; }
+            input[type="radio"] { display: inline-block !important; }
+            input { border: none !important; border-bottom: 1px solid #000 !important; color: #000 !important; background: transparent !important;}
+        }
+    </style>
+</head>
+<body>
+
+<div id="cheat-alert">⚠️ ACCIÓN DETECTADA: Intento de copia, salida de pantalla o uso de software externo registrado.</div>
+
+<div class="container" id="main-exam-flow">
+    
+    <header>
+        <h1>AI Laboratory: Desarrollo de Algoritmos v4.0</h1>
+        <p>Especialidad Técnica en Inteligencia Artificial • Entrenamiento Interactivo</p>
+        <div class="timer-badge">⏳ Tiempo Límite Sugerido: 60 Minutos</div>
+    </header>
+
+    <div class="card">
+        <h3>👤 Credenciales Obligatorias del Estudiante</h3>
+        <div class="grid-inputs">
+            <div class="form-group">
+                <label>Nombre Completo:</label>
+                <input type="text" id="input-name" placeholder="Ej. Alan Turing López">
+            </div>
+            <div class="form-group">
+                <label>Matrícula / ID Académico:</label>
+                <input type="text" id="input-id" placeholder="Ej. MS-IA-2026-09">
+            </div>
+            <div class="form-group">
+                <label>Grupo y Turno:</label>
+                <input type="text" id="input-group" placeholder="Ej. 2° B - Matutino">
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">Bloque A: Fundamentos Lógicos y de Control</h2>
+
+    <div class="card">
+        <h3>🧠 Pregunta 1: Control de Ciclo por Parada Temprana</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: Prevención del Sobreajuste (Overfitting)</h4>
+            <p>En Machine Learning, si un modelo entrena demasiado tiempo, comienza a memorizar los datos en lugar de aprender patrones generales. Para evitar este "Sobreajuste", los ingenieros usan una técnica llamada <em>Early Stopping</em> (Parada Temprana), que interrumpe dinámicamente el entrenamiento justo cuando el modelo deja de mejorar, sin importar cuántos pasos faltaban.</p>
+        </div>
+        <p>Estás entrenando una Red Neuronal y notas que el error de validación sube drásticamente. Deseas implementar un algoritmo con un bucle que detenga el entrenamiento automáticamente si el error no mejora en 3 iteraciones continuas. ¿Qué tipo de control lógico requiere esta acción?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q1" value="A"> A) Una secuencia lineal simple sin condiciones de parada.</label>
+            <label class="option-label"><input type="radio" name="q1" value="B"> B) Un ciclo iterativo condicional (Mientras) controlado por una variable bandera o centinela de paciencia.</label>
+            <label class="option-label"><input type="radio" name="q1" value="C"> C) Una estructura de selección múltiple (Caso/Switch) basada en números fijos.</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> Los ciclos estructurados como <em>Mientras (While)</em> evalúan una condición booleana antes de ejecutar su bloque. Son ideales para sistemas dinámicos donde no conocemos el número exacto de pasos previos.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🎯 Pregunta 2: Estructuras Anidadas en Visión Artificial</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: Árboles de Decisión y Umbrales Jerárquicos</h4>
+            <p>Los sistemas de IA evalúan su entorno calculando un <strong>Nivel de Confianza</strong> (una probabilidad matemática de 0 a 1). Para que un coche autónomo tome una decisión segura, el algoritmo pasa esta probabilidad a través de múltiples filtros lógicos encadenados. Si la situación no es crítica, se evalúa el nivel de precaución medio, y así sucesivamente.</p>
+        </div>
+        <p>En el flujo de imágenes de un vehículo autónomo: Si el grado de confianza en la detección de un peatón es mayor a 0.85, ejecuta "Frenado de Emergencia". Si está entre 0.50 y 0.85, ejecuta "Reducir Velocidad". De lo contrario, "Mantener Marcha". ¿Cuál es el orden correcto de anidamiento estructural para resolverlo?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q2" value="A"> A) Si (Confianza > 0.85) Sino [ Si (Confianza >= 0.50) Sino (Mantener Marcha) ]</label>
+            <label class="option-label"><input type="radio" name="q2" value="B"> B) Repetir Hasta que Confianza sea igual a 0.</label>
+            <label class="option-label"><input type="radio" name="q2" value="C"> C) Una secuencia fija que ejecute las tres acciones al mismo tiempo.</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> Las estructuras condicionales anidadas permiten bifurcar el flujo de control en múltiples opciones exclusivas para clasificar el estado de las variables secuencialmente.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>📊 Pregunta 3: Arreglos y Filtros de Datos (Data Preprocessing)</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: Preprocesamiento y Limpieza de Datos</h4>
+            <p>La IA aprende de los datos, y aplica la regla de <em>"basura que entra, basura que sale"</em>. Los datos sin procesar se almacenan en estructuras llamadas <strong>Arreglos (Vectores)</strong> y suelen contener errores o valores nulos (NaN). El primer trabajo de un algoritmo de IA es inspeccionar posición por posición para limpiar esta información.</p>
+        </div>
+        <p>Antes de alimentar un modelo, necesitas filtrar los valores nulos dentro de un arreglo unidimensional de 1000 registros. ¿Cuál es la estrategia algorítmica estándar?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q3" value="A"> A) Multiplicar todo el arreglo por cero secuencialmente de un solo golpe.</label>
+            <label class="option-label"><input type="radio" name="q3" value="B"> B) Recorrer el arreglo con un ciclo 'Para' (For) e inspeccionar cada elemento mediante un condicional 'Si' que descarte el valor inválido.</label>
+            <label class="option-label"><input type="radio" name="q3" value="C"> C) Cambiar los datos a tipo String para que la computadora asuma que son correctos.</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> Los ciclos indexados (<em>Para / For</em>) son la herramienta óptima para recorrer arreglos porque conocemos con precisión matemática la longitud exacta de la lista de datos a procesar.
+        </div>
+    </div>
+
+
+    <h2 class="section-title">Bloque B: Laboratorio de Simulaciones Dinámicas</h2>
+
+    <div class="card">
+        <h3>💻 Simulador 1: Umbral de Activación (Perceptrón)</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: La Neurona Artificial y Funciones de Activación</h4>
+            <p>El <strong>Perceptrón</strong> es la unidad matemática fundamental de una Red Neuronal. Funciona sumando el "peso" de las señales que recibe. Si esa suma supera un límite específico llamado <strong>Umbral de Activación</strong>, la neurona "se enciende" (dispara un 1). Si no lo supera, se inhibe (permanece en 0).</p>
+        </div>
+        <p>Analiza el código. Modifica el valor en la casilla de entrada, presiona <strong>"Ejecutar Algoritmo"</strong> para observar el comportamiento y responde.</p>
+        
+        <div class="pseint-box">
+            <div class="pseint-header"><span>Consola PSeInt Virtual v4.0</span><span>Entorno: Clasificación</span></div>
+            <div class="pseint-code">
+                <span class="kw">Algoritmo</span> ClasificadorPerceptron<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Definir</span> entradaX, umbral <span class="kw">Como Real</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;umbral <- 0.80;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Leer</span> entradaX;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Si</span> entradaX > umbral <span class="kw">Entonces</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Escribir</span> <span class="st">"ESTADO: Clase A (Activada)"</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Sino</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Escribir</span> <span class="st">"ESTADO: Clase B (Inhibida)"</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">FinSi</span><br>
+                <span class="kw">FinAlgoritmo</span>
+            </div>
+            <div class="pseint-actions">
+                <label style="font-size:0.85rem;">[Dato entradaX]:</label>
+                <input type="number" step="0.05" id="sim1-data" class="pseint-input-val" value="0.80">
+                <button type="button" class="btn-run" onclick="correrSimulador1()">Ejecutar Algoritmo</button>
+            </div>
+            <div id="sim1-terminal" class="pseint-output"></div>
+        </div>
+
+        <p style="margin-top:20px;"><strong>Pregunta 4:</strong> Tras correr el simulador ingresando exactamente el valor frontera <strong>0.80</strong>, ¿cuál es el estado arrojado en la terminal?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q4" value="A"> A) Clase A (Activada), porque alcanza el umbral exacto.</label>
+            <label class="option-label"><input type="radio" name="q4" value="B"> B) Clase B (Inhibida), porque la condición evalúa estrictamente un valor mayor (&gt;) que el umbral y no mayor o igual.</label>
+            <label class="option-label"><input type="radio" name="q4" value="C"> C) El programa marca error por falta de tipos booleanos.</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> Un error muy común al diseñar IA es confundir los operadores relacionales. <code>></code> busca exclusividad estricta, mientras que <code>>=</code> incluye el valor límite de la frontera.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🔁 Simulador 2: Descenso de Gradiente (Pasos Incrementales)</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: Tasa de Aprendizaje (Learning Rate)</h4>
+            <p>Al optimizar un modelo mediante el algoritmo de <strong>Descenso de Gradiente</strong>, la IA da "saltos" iterativos para corregir su error matemático. El tamaño de cada salto se conoce como <em>Tasa de Aprendizaje</em>. Modificar el tamaño del incremento en un ciclo simula cómo el modelo se ajusta más rápido (o más lento) en cada iteración.</p>
+        </div>
+        <p>Prueba asignando diferentes valores límite y analiza la velocidad matemática con la que se actualiza el contador.</p>
+        
+        <div class="pseint-box">
+            <div class="pseint-header"><span>Consola PSeInt Virtual v4.0</span><span>Entorno: Bucles Matriz</span></div>
+            <div class="pseint-code">
+                <span class="kw">Algoritmo</span> AjusteGradiente<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Definir</span> iterador, limite <span class="kw">Como Entero</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;iterador <- 1;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Leer</span> limite;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Mientras</span> iterador <= limite <span class="kw">Hacer</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Escribir</span> <span class="st">"Optimización en lote procesada."</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iterador <- iterador + 3;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">FinMientras</span><br>
+                <span class="kw">FinAlgoritmo</span>
+            </div>
+            <div class="pseint-actions">
+                <label style="font-size:0.85rem;">[Límite de ciclos]:</label>
+                <input type="number" id="sim2-data" class="pseint-input-val" value="7">
+                <button type="button" class="btn-run" onclick="correrSimulador2()">Ejecutar Algoritmo</button>
+            </div>
+            <div id="sim2-terminal" class="pseint-output"></div>
+        </div>
+
+        <p style="margin-top:20px;"><strong>Pregunta 5:</strong> Si corres la simulación asignando un límite de <strong>7</strong>, ¿cuántas veces se imprime el mensaje de optimización?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q5" value="A"> A) Se ejecuta 3 veces (con el iterador valiendo 1, 4 y 7 sucesivamente).</label>
+            <label class="option-label"><input type="radio" name="q5" value="B"> B) Se ejecuta 7 veces de forma unitaria.</label>
+            <label class="option-label"><input type="radio" name="q5" value="C"> C) Ninguna vez, porque el valor inicial es impar.</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> La variable de control (<code>iterador <- iterador + 3</code>) altera el flujo convencional de un ciclo permitiendo recorrer grandes porciones de memoria en mucho menor tiempo.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🛑 Simulador 3: Función de Pérdida (Validación de Signos)</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: Funciones de Costo y Error Absoluto</h4>
+            <p>Para aprender, una Inteligencia Artificial mide constantemente qué tan equivocada está calculando una <strong>Función de Pérdida (Loss Function)</strong>. Muchas veces lo que importa es el "volumen" del error y no si es positivo o negativo. Por ello, la lógica del algoritmo convierte los fallos negativos a positivos aplicando el equivalente matemático del <em>Valor Absoluto</em>.</p>
+        </div>
+        <p>Ingresa un número negativo o positivo para evaluar el cálculo final de la penalización del error.</p>
+        
+        <div class="pseint-box">
+            <div class="pseint-header"><span>Consola PSeInt Virtual v4.0</span><span>Entorno: Funciones Costo</span></div>
+            <div class="pseint-code">
+                <span class="kw">Algoritmo</span> FiltroPerdida<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Definir</span> score <span class="kw">Como Real</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Leer</span> score;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Si</span> score < 0 <span class="kw">Entonces</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;score <- score * -1;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">FinSi</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Escribir</span> <span class="st">"Magnitud absoluta del error: "</span>, score;<br>
+                <span class="kw">FinAlgoritmo</span>
+            </div>
+            <div class="pseint-actions">
+                <label style="font-size:0.85rem;">[Valor score]:</label>
+                <input type="number" id="sim3-data" class="pseint-input-val" value="-15">
+                <button type="button" class="btn-run" onclick="correrSimulador3()">Ejecutar Algoritmo</button>
+            </div>
+            <div id="sim3-terminal" class="pseint-output"></div>
+        </div>
+
+        <p style="margin-top:20px;"><strong>Pregunta 6:</strong> Si el usuario ingresa un valor inicial de <strong>-15</strong>, ¿qué se mostrará finalmente impreso tras pasar por la estructura de selección?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q6" value="A"> A) Magnitud absoluta del error: -15</label>
+            <label class="option-label"><input type="radio" name="q6" value="B"> B) Magnitud absoluta del error: 15</label>
+            <label class="option-label"><input type="radio" name="q6" value="C"> C) 0</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> Multiplicar por -1 dentro de un condicional es la forma algorítmica fundamental de homogeneizar datos desviados antes de sumarlos al total del error del sistema.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🤖 Simulador 4: Contador Automático de Anomalías</h3>
+        <div class="context-box">
+            <h4>📖 Contexto: Procesamiento por Lotes y Acumulación</h4>
+            <p>En análisis de Big Data, procesar millones de datos simultáneamente sobrecarga la memoria. La solución de ingeniería es enviar pequeños bloques progresivos (<em>batches</em>). Para llevar la cuenta total de los resultados de cada bloque, la IA usa estructuras llamadas <strong>Variables Acumuladoras</strong>, que actualizan y guardan el peso sumado de cada iteración del ciclo.</p>
+        </div>
+        <p>Este simulador corre una estructura iterativa de tipo "Para" que acumula el valor en una simulación secuencial.</p>
+        
+        <div class="pseint-box">
+            <div class="pseint-header"><span>Consola PSeInt Virtual v4.0</span><span>Entorno: Contador Ciclos</span></div>
+            <div class="pseint-code">
+                <span class="kw">Algoritmo</span> ContadorDeAnomalias<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Definir</span> i, acumulador <span class="kw">Como Entero</span>;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;acumulador <- 0;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Para</span> i <- 1 <span class="kw">Hasta</span> 4 <span class="kw">Con Paso</span> 1 <span class="kw">Hacer</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;acumulador <- acumulador + i;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">FinPara</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">Escribir</span> <span class="st">"Anomalías acumuladas: "</span>, acumulador;<br>
+                <span class="kw">FinAlgoritmo</span>
+            </div>
+            <div class="pseint-actions">
+                <button type="button" class="btn-run" onclick="correrSimulador4()">Ejecutar Algoritmo Fijo</button>
+            </div>
+            <div id="sim4-terminal" class="pseint-output"></div>
+        </div>
+
+        <p style="margin-top:20px;"><strong>Pregunta 7:</strong> Al finalizar todas las vueltas del ciclo 'Para', ¿cuál es el valor final almacenado en la variable 'acumulador'?</p>
+        <div class="options-container">
+            <label class="option-label"><input type="radio" name="q7" value="A"> A) 4</label>
+            <label class="option-label"><input type="radio" name="q7" value="B"> B) 10 (Suma consecutiva de 1 + 2 + 3 + 4).</label>
+            <label class="option-label"><input type="radio" name="q7" value="C"> C) 0</label>
+        </div>
+        <div class="review-box">
+            <strong>💡 Apunte de Repaso:</strong> Una variable acumuladora tiene como función sumar valores heterogéneos de manera progresiva sobre su propio valor guardado con anterioridad (<code>acumulador <- acumulador + valor_nuevo</code>).
+        </div>
+    </div>
+
+
+    <button type="button" class="btn-submit-exam" onclick="calcularYBloquearExamen()">🔒 Finalizar Examen y Calcular Métricas</button>
+
+    <div class="card" id="results-area">
+        <h3>📊 Reporte Final de Integridad y Conocimiento Académico</h3>
+        <div id="meta-student-results" style="margin-bottom:15px; border-bottom:1px solid #475569; padding-bottom:15px;"></div>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-num" id="stat-score">0 / 7</span>
+                Aciertos Totales
+            </div>
+            <div class="stat-box">
+                <span class="stat-num" id="stat-runs">0</span>
+                Simulaciones Ejecutadas
+            </div>
+            <div class="stat-box critical">
+                <span class="stat-num" id="stat-cheats">0</span>
+                Infracciones Registradas
+            </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <strong>Dictamen Final del Entorno Seguro:</strong>
+            <p id="dictamen-texto" style="margin-top:5px; color: var(--neon-blue);"></p>
+        </div>
+
+        <button type="button" class="btn-print" onclick="imprimirAPDF()">📥 Generar PDF Oficial de Resultados</button>
+    </div>
+
+</div>
+
+<script>
+    let cheatCounter = 0;
+    let runCounter = 0;
+    let isFinished = false;
+
+    // --- SISTEMA CONTROL ANTI-FRAUDE ---
+    function triggerWarning() {
+        if(isFinished) return;
+        cheatCounter++;
+        const alertBox = document.getElementById('cheat-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => { alertBox.style.display = 'none'; }, 3500);
+        document.getElementById('stat-cheats').innerText = cheatCounter;
+    }
+
+    document.addEventListener('copy', (e) => { e.preventDefault(); triggerWarning(); });
+    document.addEventListener('paste', (e) => { e.preventDefault(); triggerWarning(); });
+    document.addEventListener('cut', (e) => { e.preventDefault(); triggerWarning(); });
+    document.addEventListener('contextmenu', (e) => { e.preventDefault(); triggerWarning(); });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && ['c', 'v', 'u', 'i', 'j'].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+            triggerWarning();
+        }
+        if (e.key === 'F12') { e.preventDefault(); triggerWarning(); }
+    });
+
+    window.addEventListener('blur', () => { triggerWarning(); });
+
+    // --- CONTROL DE EJECUCIÓN DE SIMULADORES ---
+    function correrSimulador1() {
+        if(isFinished) return;
+        runCounter++; document.getElementById('stat-runs').innerText = runCounter;
+        const val = parseFloat(document.getElementById('sim1-data').value);
+        const term = document.getElementById('sim1-terminal'); term.style.display = 'block';
+
+        if(isNaN(val)) { term.innerHTML = "[ERROR]: Entrada inválida."; return; }
+        term.innerHTML = "--- EJECUTANDO... ---<br>";
+        if(val > 0.80) {
+            term.innerHTML += "Salida: <span style='color:var(--neon-green)'>ESTADO: Clase A (Activada)</span><br>";
+        } else {
+            term.innerHTML += "Salida: <span>ESTADO: Clase B (Inhibida)</span><br>";
+        }
+        term.innerHTML += "--- FIN DE LA EJECUCIÓN ---";
+    }
+
+    function correrSimulador2() {
+        if(isFinished) return;
+        runCounter++; document.getElementById('stat-runs').innerText = runCounter;
+        const limit = parseInt(document.getElementById('sim2-data').value);
+        const term = document.getElementById('sim2-terminal'); term.style.display = 'block';
+
+        if(isNaN(limit) || limit < 1) { term.innerHTML = "[ERROR]: Entrada no válida."; return; }
+        term.innerHTML = "--- EJECUTANDO BUCLE... ---<br>";
+        let i = 1; let c = 0;
+        while(i <= limit) {
+            term.innerHTML += `[Paso i = ${i}]: Optimización en lote procesada.<br>`;
+            i += 3; c++;
+            if(c > 15) { term.innerHTML += "...Límite visual forzado...<br>"; break; }
+        }
+        term.innerHTML += `--- COMPILADO CORRECTAMENTE. MENSAJES IMPRESOS: ${c} ---`;
+    }
+
+    function correrSimulador3() {
+        if(isFinished) return;
+        runCounter++; document.getElementById('stat-runs').innerText = runCounter;
+        let score = parseFloat(document.getElementById('sim3-data').value);
+        const term = document.getElementById('sim3-terminal'); term.style.display = 'block';
+
+        if(isNaN(score)) { term.innerHTML = "[ERROR]: Ingrese número de valor real."; return; }
+        term.innerHTML = "--- EJECUTANDO FILTRO... ---<br>";
+        if(score < 0) { score = score * -1; }
+        term.innerHTML += `Salida terminal: Magnitud absoluta del error: ${score}<br>--- COMPLETO ---`;
+    }
+
+    function correrSimulador4() {
+        if(isFinished) return;
+        runCounter++; document.getElementById('stat-runs').innerText = runCounter;
+        const term = document.getElementById('sim4-terminal'); term.style.display = 'block';
+        term.innerHTML = "--- EJECUTANDO BUCLE DEFINIDO 'PARA' ---<br>";
+        let acumulador = 0;
+        for (let i = 1; i <= 4; i++) {
+            acumulador += i;
+            term.innerHTML += `Paso ciclo actual [i = ${i}]. Acumulado temporal = ${acumulador}<br>`;
+        }
+        term.innerHTML += `Salida terminal: Anomalías acumuladas: ${acumulador}<br>--- PROCESO FINALIZADO ---`;
+    }
+
+    // --- PROCESAMIENTO GLOBAL ---
+    function calcularYBloquearExamen() {
+        const name = document.getElementById('input-name').value.trim();
+        const uid = document.getElementById('input-id').value.trim();
+        const group = document.getElementById('input-group').value.trim();
+
+        if(!name || !uid || !group) {
+            alert("⚠️ ALERTA INTERNA: Registre nombre, ID y grupo de manera obligatoria para emitir el dictamen.");
+            return;
+        }
+
+        isFinished = true;
+        const answers = { q1: "B", q2: "A", q3: "B", q4: "B", q5: "A", q6: "B", q7: "B" };
+        let grade = 0;
+
+        for (let k in answers) {
+            const checkedOpt = document.querySelector(`input[name="${k}"]:checked`);
+            if(checkedOpt && checkedOpt.value === answers[k]) { grade++; }
+        }
+
+        document.querySelectorAll('input, button:not(.btn-print)').forEach(el => el.disabled = true);
+
+        document.getElementById('meta-student-results').innerHTML = `
+            <p><strong>Estudiante Técnico:</strong> ${name} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>ID:</strong> ${uid}</p>
+            <p><strong>Módulo de IA - Grupo:</strong> ${group} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Cierre Oficial:</strong> ${new Date().toLocaleString()}</p>
+        `;
+
+        document.getElementById('stat-score').innerText = `${grade} / 7`;
+        document.getElementById('stat-runs').innerText = runCounter;
+        document.getElementById('stat-cheats').innerText = cheatCounter;
+
+        const dictamen = document.getElementById('dictamen-texto');
+        if(cheatCounter === 0) {
+            dictamen.innerHTML = "✅ <strong>Entorno Seguro Convalidado:</strong> Integridad intachable. El alumno procesó los esquemas interactivos sin abandonar el foco de la prueba.";
+        } else if(cheatCounter > 0 && cheatCounter <= 4) {
+            dictamen.innerHTML = "⚠️ <strong>Monitoreo de Advertencia:</strong> Se detectaron desvíos moderados de foco de pantalla o intentos de copia.";
+        } else {
+            dictamen.innerHTML = "❌ <strong>Alerta por Fraude de IA / Copia Externa:</strong> El entorno ha registrado anomalías críticas persistentes. El perfil del reporte denota intentos forzados de inyección de código externo o uso de agentes conversacionales externos.";
+            dictamen.style.color = "var(--neon-red)";
+        }
+
+        document.getElementById('results-area').style.display = 'block';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function imprimirAPDF() {
+        window.print();
+    }
+</script>
+</body>
+</html>
