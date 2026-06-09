@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parámetros IA = Mi desempeño</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;padding:22px 20px 30px;color:#1a1a1a;max-width:720px;margin:0 auto;font-size:13px}
+h1{font-size:17px;font-weight:600;text-align:center;margin-bottom:4px;color:#111}
+.sub{font-size:11px;color:#888;text-align:center;margin-bottom:14px}
+.dato{font-size:12px;color:#555;border-bottom:1px solid #ccc;display:inline-block;min-width:130px;margin:0 6px}
+.leg{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:#555;background:#f4f4f2;border-radius:20px;padding:3px 10px}
+.ld{width:8px;height:8px;border-radius:50%}
+
+/* TABLA PRINCIPAL */
+table.main{width:100%;border-collapse:collapse;border:1.5px solid #ccc;border-radius:10px;overflow:hidden}
+table.main th{padding:9px 12px;font-size:11.5px;font-weight:600}
+th.hia{background:#EEEDFE;color:#3C3489;border-right:1px solid #AFA9EC;border-bottom:2px solid #AFA9EC;width:43%}
+th.hmid{background:#f4f4f2;color:#aaa;border-bottom:2px solid #ccc;width:7%;text-align:center;font-size:14px}
+th.hyo{background:#E1F5EE;color:#085041;border-left:1px solid #5DCAA5;border-bottom:2px solid #5DCAA5;width:50%}
+table.main td{vertical-align:top;padding:10px 12px;font-size:12px;line-height:1.45;border-bottom:1px solid #e8e8e8}
+td.cia{border-right:1px solid #AFA9EC}
+td.cmid{text-align:center;font-size:16px;color:#bbb;border-bottom:1px solid #e8e8e8}
+td.cyo{border-left:1px solid #5DCAA5}
+table.main tr:last-child td{border-bottom:none}
+.pn{font-weight:700;font-size:10.5px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.it{color:#3C3489;font-size:12px}
+.yt{color:#085041;font-size:12px}
+.fl{border:none;border-bottom:1px dashed #bbb;width:100%;background:transparent;font-size:11.5px;font-family:Arial,sans-serif;color:#111;outline:none;padding:2px 0;margin-top:5px}
+
+/* SECCIÓN INFERIOR */
+.bot{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.bx{border:1.5px solid #ccc;border-radius:10px;overflow:hidden}
+.bh{padding:7px 12px;font-size:11.5px;font-weight:600;border-bottom:1px solid #e8e8e8;background:#f8f8f6;color:#333}
+.bb{padding:10px 12px}
+.gg{display:grid;grid-template-columns:1fr 1fr 1fr}
+.gc{padding:7px 8px;text-align:center;border-right:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8}
+.gc:nth-child(3n){border-right:none}
+.gc:nth-last-child(-n+3){border-bottom:none}
+.gl{font-size:10px;color:#999;margin-bottom:3px}
+.gv{font-size:17px;font-weight:600;width:100%;border:none;background:transparent;font-family:Arial,sans-serif;color:#111;outline:none;border-bottom:1.5px dashed #bbb;text-align:center;padding:1px 0}
+.gv.red{color:#c0392b}
+.qlab{font-size:11px;color:#666;margin-bottom:3px}
+
+/* COMPROMISO */
+.cmt{margin-top:12px;border:1.5px solid #5DCAA5;border-radius:10px;overflow:hidden}
+.cmth{background:#E1F5EE;padding:7px 12px;font-size:11.5px;font-weight:600;color:#085041;border-bottom:1px solid #5DCAA5}
+.cmtb{padding:10px 14px;display:flex;gap:20px;align-items:flex-end}
+.sig{flex:1;font-size:10px;color:#999;text-align:center}
+.sigline{border-bottom:1px solid #ccc;margin-bottom:4px;height:20px}
+.foot{margin-top:12px;text-align:center;font-size:10px;color:#aaa;border-top:1px solid #e8e8e8;padding-top:10px}
+
+@media print{
+  body{padding:10px 14px 18px}
+  input{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:1.5cm}
+}
+</style>
+</head>
+<body>
+<h1>Parámetros de IA &nbsp;=&nbsp; Mi desempeño en clase</h1>
+<p class="sub">
+  Nombre: <span class="dato">&nbsp;</span>
+  Grupo: <span class="dato" style="min-width:50px">&nbsp;</span>
+  Fecha: <span class="dato" style="min-width:80px">&nbsp;</span>
+</p>
+<div class="leg">
+  <div class="li"><span class="ld" style="background:#7F77DD"></span>Parámetro del modelo de IA</div>
+  <div class="li"><span class="ld" style="background:#1D9E75"></span>Mi parámetro como alumno</div>
+</div>
+
+<table class="main">
+  <thead>
+    <tr>
+      <th class="hia">Modelo de IA</th>
+      <th class="hmid">=</th>
+      <th class="hyo">Yo en clase</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="cia">
+        <div class="pn"><span class="dot" style="background:#7F77DD"></span>Temperatura</div>
+        <div class="it">Controla creatividad vs precisión. Alta = respuestas variadas e inesperadas. Baja = respuestas exactas y seguras.</div>
+      </td>
+      <td class="cmid">&#8644;</td>
+      <td class="cyo">
+        <div class="pn"><span class="dot" style="background:#1D9E75"></span>Participación</div>
+        <div class="yt">¿Aportas ideas propias o solo repites lo que escuchas?</div>
+        <input class="fl" type="text" placeholder="¿Cómo participas hoy?"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="cia">
+        <div class="pn"><span class="dot" style="background:#7F77DD"></span>Longitud de respuesta (max tokens)</div>
+        <div class="it">Define cuánto esfuerzo invierte el modelo en responder. Más tokens = respuesta más completa y desarrollada.</div>
+      </td>
+      <td class="cmid">&#8644;</td>
+      <td class="cyo">
+        <div class="pn"><span class="dot" style="background:#1D9E75"></span>Esfuerzo y entregables</div>
+        <div class="yt">¿Haces lo mínimo o das tu máximo en tareas y proyectos?</div>
+        <input class="fl" type="text" placeholder="¿Qué tanto te esfuerzas?"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="cia">
+        <div class="pn"><span class="dot" style="background:#7F77DD"></span>Calidad del prompt</div>
+        <div class="it">Instrucción clara = resultado útil. Prompt vago o confuso = resultado inútil o equivocado.</div>
+      </td>
+      <td class="cmid">&#8644;</td>
+      <td class="cyo">
+        <div class="pn"><span class="dot" style="background:#1D9E75"></span>Atención e instrucciones</div>
+        <div class="yt">¿Escuchas y entiendes lo que se pide antes de actuar?</div>
+        <input class="fl" type="text" placeholder="¿Sigues instrucciones?"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="cia">
+        <div class="pn"><span class="dot" style="background:#7F77DD"></span>Penalización por repetición</div>
+        <div class="it">Evita que el modelo repita siempre lo mismo. Fuerza variedad y nuevas ideas en cada respuesta.</div>
+      </td>
+      <td class="cmid">&#8644;</td>
+      <td class="cyo">
+        <div class="pn"><span class="dot" style="background:#1D9E75"></span>Comportamiento en clase</div>
+        <div class="yt">¿Repites conductas negativas o buscas mejorar en cada sesión?</div>
+        <input class="fl" type="text" placeholder="¿Qué conductas repites?"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="cia">
+        <div class="pn"><span class="dot" style="background:#7F77DD"></span>Ventana de contexto</div>
+        <div class="it">Cuánto "recuerda" el modelo de la conversación. Sin contexto, pierde el hilo y comete errores.</div>
+      </td>
+      <td class="cmid">&#8644;</td>
+      <td class="cyo">
+        <div class="pn"><span class="dot" style="background:#1D9E75"></span>Asistencia y puntualidad</div>
+        <div class="yt">Si faltas o llegas tarde, pierdes el contexto — igual que un modelo sin memoria.</div>
+        <input class="fl" type="text" placeholder="¿Cuántas faltas/tardanzas?"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="cia">
+        <div class="pn"><span class="dot" style="background:#7F77DD"></span>Ajuste fino (fine-tuning)</div>
+        <div class="it">El modelo mejora con datos de calidad y práctica. Sin entrenamiento constante, no aprende ni evoluciona.</div>
+      </td>
+      <td class="cmid">&#8644;</td>
+      <td class="cyo">
+        <div class="pn"><span class="dot" style="background:#1D9E75"></span>Estudio y práctica</div>
+        <div class="yt">¿Practicas fuera de clase o solo "corres" cuando hay examen?</div>
+        <input class="fl" type="text" placeholder="¿Cómo estudias?"/>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="bot">
+  <div class="bx">
+    <div class="bh">Mis calificaciones actuales</div>
+    <div class="gg">
+      <div class="gc"><div class="gl">Parcial 1</div><input class="gv" type="text" placeholder="—"/></div>
+      <div class="gc"><div class="gl">Parcial 2</div><input class="gv" type="text" placeholder="—"/></div>
+      <div class="gc"><div class="gl">Parcial 3</div><input class="gv" type="text" placeholder="—"/></div>
+      <div class="gc"><div class="gl">Tareas</div><input class="gv" type="text" placeholder="—"/></div>
+      <div class="gc"><div class="gl">Proyectos</div><input class="gv" type="text" placeholder="—"/></div>
+      <div class="gc"><div class="gl" style="color:#c0392b">Promedio</div><input class="gv red" type="text" placeholder="—"/></div>
+    </div>
+  </div>
+  <div class="bx">
+    <div class="bh">Reflexión personal</div>
+    <div class="bb">
+      <div class="qlab">¿Qué parámetro tuyo necesita más ajuste?</div>
+      <input class="fl" type="text" placeholder="Escribe el parámetro..."/>
+      <div class="qlab" style="margin-top:9px">¿Por qué está fallando ese parámetro?</div>
+      <input class="fl" type="text" placeholder="Sé honesto/a..."/>
+      <div class="qlab" style="margin-top:9px">¿Cómo lo voy a corregir?</div>
+      <input class="fl" type="text" placeholder="Acción concreta..."/>
+    </div>
+  </div>
+</div>
+
+<div class="cmt">
+  <div class="cmth">Mi compromiso para la siguiente evaluación</div>
+  <div class="cmtb">
+    <div style="flex:3">
+      <div style="font-size:11px;color:#555;margin-bottom:4px">Me comprometo a:</div>
+      <input class="fl" type="text" placeholder="Describe una acción específica y medible..." style="width:100%"/>
+    </div>
+    <div class="sig" style="flex:1"><div class="sigline"></div>Firma del alumno</div>
+    <div class="sig" style="flex:1"><div class="sigline"></div>Visto bueno docente</div>
+  </div>
+</div>
+
+<div class="foot">Materia: Inteligencia Artificial &nbsp;&middot;&nbsp; Actividad de reflexión formativa &nbsp;&middot;&nbsp; Ctrl+P para exportar a PDF</div>
+</body>
+</html>
