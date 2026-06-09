@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmoSense · Módulo 2 — Optimización de Hiperparámetros</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── ESTILOS EXTRA PARA GUÍA DE LABORATORIO ─── */
+.lab-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--cyan);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.lab-section .lab-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.lab-section p {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+.lab-section p:last-child { margin-bottom: 0; }
+.lab-section strong { color: var(--text); }
+.lab-section .lab-note {
+  display: inline-block;
+  background: var(--yellow-bg);
+  border: 1px solid var(--yellow);
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  margin-top: 8px;
+}
+.code-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.code-block pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: var(--cyan);
+  white-space: pre;
+  overflow-x: auto;
+}
+.code-block pre .kw   { color: #c084fc; }
+.code-block pre .fn   { color: #93c5fd; }
+.code-block pre .st   { color: #86efac; }
+.code-block pre .nm   { color: #fb923c; }
+.code-block pre .cm   { color: #4a4a65; font-style: italic; }
+.code-block pre .hi   {
+  display: block;
+  background: rgba(124,106,247,.08);
+  border-left: 2px solid var(--accent);
+  margin: 0 -16px;
+  padding: 0 16px 0 14px;
+}
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.res-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.res-field label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.res-field input {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  outline: none;
+  transition: border-color var(--transition),
+              box-shadow var(--transition);
+}
+.res-field input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(6,182,212,.18);
+}
+.res-field input::placeholder {
+  color: var(--text2);
+  opacity: .4;
+}
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin: 14px 0;
+}
+.config-table th {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  padding: 9px 12px;
+  text-align: left;
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.config-table td {
+  border: 1px solid var(--border);
+  padding: 9px 12px;
+  color: var(--text2);
+  transition: background var(--transition);
+}
+.config-table tr:hover td {
+  background: var(--bg3);
+}
+.config-table .name-cell {
+  color: var(--text);
+  font-weight: 600;
+}
+.config-table .mine-row td {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.pipeline-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.pf-box {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--text);
+  text-align: center;
+}
+.pf-box .pf-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text2);
+  display: block;
+  margin-bottom: 3px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.pf-box.pf-a { border-color: var(--cyan); }
+.pf-box.pf-b { border-color: var(--accent); }
+.pf-box.pf-c {
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.pf-arrow {
+  font-size: 18px;
+  color: var(--border2);
+}
+</style>
+</head>
+<body>
+
+<!-- ── WATERMARK ─────────────────────────────────────── -->
+<div class="wm" aria-hidden="true">
+  <div class="wm-inner">
+    <span class="wm-text">EmoSense · Módulo 2</span>
+    <span class="wm-text">EmoSense · Módulo 2</span>
+    <span class="wm-text">EmoSense · Módulo 2</span>
+    <span class="wm-text">EmoSense · Módulo 2</span>
+    <span class="wm-text">EmoSense · Módulo 2</span>
+    <span class="wm-text">EmoSense · Módulo 2</span>
+  </div>
+</div>
+
+<!-- ── TOPBAR ─────────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-left">
+    <span class="tb-materia">EmoSense</span>
+    <span class="tb-semestre">Módulo III · Inteligencia Emocional + IA</span>
+  </div>
+  <div class="tb-right">
+    <span id="infraction-badge">⚠ infracciones: <span id="infr-count">0</span></span>
+    <div id="timer">90:00</div>
+    <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+  </div>
+</div>
+
+<!-- ── CONTENEDOR ─────────────────────────────────────── -->
+<div class="container">
+
+  <!-- ENCABEZADO -->
+  <div class="eval-header">
+    <div class="eval-tag">Proyecto Final — Etapa 2</div>
+    <h1>EmoSense · Módulo 2<br>Optimización de Hiperparámetros</h1>
+    <div class="eval-sub">
+      Compara 6 configuraciones · Cross-validation · Pipeline · Guarda el modelo óptimo
+    </div>
+    <div class="eval-meta">
+      <span>📁 02_optimizacion.py</span>
+      <span>⏱ 90 min</span>
+      <span>⚙️ IDLE · sklearn · Pipeline</span>
+      <span>🎯 10 preguntas · 100 pts</span>
+    </div>
+  </div>
+
+  <!-- DATOS DEL ALUMNO -->
+  <div class="student-card">
+    <div class="sc-title">Datos del alumno</div>
+    <div class="sc-grid">
+      <div class="sc-field">
+        <label>Nombre completo</label>
+        <input type="text" id="inp-nombre"
+               placeholder="Tu nombre aquí">
+      </div>
+      <div class="sc-field">
+        <label>Grupo</label>
+        <input type="text" id="inp-grupo"
+               placeholder="Ej: LSC-2B">
+      </div>
+      <div class="sc-field">
+        <label>Fecha</label>
+        <input type="text" id="inp-fecha"
+               placeholder="DD/MM/AAAA">
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       GUÍA DE LABORATORIO — LEE ANTES DE ABRIR IDLE
+  ════════════════════════════════════════════════ -->
+  <div class="section-title">Guía de laboratorio</div>
+
+  <!-- Contexto -->
+  <div class="context-box">
+    <div class="ctx-title">¿Qué hacemos en este módulo?</div>
+    <p>
+      En el Módulo 1 entrenaste un clasificador de emociones con una
+      configuración fija. <strong>Ahora compararemos 6 combinaciones
+      distintas de hiperparámetros</strong> para encontrar cuál produce
+      el mejor F1-Score en EmoSense.
+    </p>
+    <p>
+      La clave de este módulo es el <strong>cross-validation
+      estratificado</strong>: en lugar de evaluar con una sola partición
+      80/20, el modelo se entrena y prueba 5 veces con distintos datos.
+      Esto da una estimación mucho más confiable del rendimiento real.
+    </p>
+    <p>
+      También usaremos <strong>Pipeline</strong> de sklearn para encadenar
+      TF-IDF + Random Forest en un objeto único. Esto previene la
+      <em>contaminación de datos</em>: el vocabulario se aprende dentro
+      de cada pliegue, no antes.
+    </p>
+  </div>
+
+  <!-- Diagrama del pipeline -->
+  <div class="lab-section">
+    <div class="lab-tag">📐 El pipeline del módulo 2</div>
+    <div class="pipeline-flow">
+      <div class="pf-box">
+        <span class="pf-tag">Entrada</span>
+        Texto crudo en español
+      </div>
+      <span class="pf-arrow">→</span>
+      <div class="pf-box pf-a">
+        <span class="pf-tag">Paso 1</span>
+        limpiar_texto()
+      </div>
+      <span class="pf-arrow">→</span>
+      <div class="pf-box pf-a">
+        <span class="pf-tag">Paso 2 — hiperparámetro</span>
+        TfidfVectorizer
+      </div>
+      <span class="pf-arrow">→</span>
+      <div class="pf-box pf-b">
+        <span class="pf-tag">Paso 3 — hiperparámetro</span>
+        RandomForestClassifier
+      </div>
+      <span class="pf-arrow">→</span>
+      <div class="pf-box pf-c">
+        <span class="pf-tag">Salida</span>
+        Emoción predicha
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-top:6px">
+      <strong>Pipeline()</strong> envuelve los pasos 2 y 3.
+      <strong>cross_val_score()</strong> repite los pasos 1→2→3 cinco veces
+      con distintas particiones para evaluar qué tan bien generaliza
+      cada configuración.
+    </p>
+  </div>
+
+  <!-- Las 6 configuraciones -->
+  <div class="lab-section">
+    <div class="lab-tag">⚙️ Las 6 configuraciones a comparar</div>
+    <table class="config-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>max_features</th>
+          <th>n_estimators</th>
+          <th>max_depth</th>
+          <th>min_leaf</th>
+          <th>¿Qué prueba?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>C1</td>
+          <td class="name-cell">Base (M1 default)</td>
+          <td>500</td><td>100</td><td>None</td><td>1</td>
+          <td style="color:var(--text2);font-size:11px">Punto de partida del M1</td>
+        </tr>
+        <tr>
+          <td>C2</td>
+          <td class="name-cell">+Vocabulario</td>
+          <td>1000</td><td>100</td><td>None</td><td>1</td>
+          <td style="color:var(--text2);font-size:11px">¿Más palabras ayudan?</td>
+        </tr>
+        <tr>
+          <td>C3</td>
+          <td class="name-cell">Profundidad limitada</td>
+          <td>500</td><td>100</td><td>10</td><td>2</td>
+          <td style="color:var(--text2);font-size:11px">¿Reduce sobreajuste?</td>
+        </tr>
+        <tr>
+          <td>C4</td>
+          <td class="name-cell">Más árboles</td>
+          <td>500</td><td>200</td><td>None</td><td>1</td>
+          <td style="color:var(--text2);font-size:11px">¿200 árboles mejoran?</td>
+        </tr>
+        <tr>
+          <td>C5</td>
+          <td class="name-cell">Regularizada</td>
+          <td>800</td><td>150</td><td>8</td><td>3</td>
+          <td style="color:var(--text2);font-size:11px">Balance regularización+vocab</td>
+        </tr>
+        <tr class="mine-row">
+          <td>C6</td>
+          <td class="name-cell">Tu hipótesis ✏️</td>
+          <td>← tú</td><td>← tú</td><td>← tú</td><td>← tú</td>
+          <td style="color:var(--accent);font-size:11px">Lo que diseñaste en el aula</td>
+        </tr>
+      </tbody>
+    </table>
+    <span class="lab-note">
+      C6: usa los valores que escribiste en la Actividad 4C del aula
+    </span>
+  </div>
+
+  <!-- ── CÓDIGO BLOQUE 1: IMPORTS ─────────────────── -->
+  <div class="section-title">Código — copia en IDLE como 02_optimizacion.py</div>
+
+  <div class="code-label">Bloque 1 · Importaciones</div>
+  <div class="code-block">
+<pre>
+<span class="cm">"""
+EmoSense — Módulo 2: Optimización de Hiperparámetros
+Ejecutar desde IDLE: F5
+Guarda en la misma carpeta que 01_dataset_modelo_base.py
+"""</span>
+
+<span class="kw">import</span> warnings
+warnings.<span class="fn">filterwarnings</span>(<span class="st">"ignore"</span>)
+
+<span class="kw">import</span> os
+<span class="kw">import</span> re
+
+<span class="kw">import</span> matplotlib
+matplotlib.<span class="fn">use</span>(<span class="st">"TkAgg"</span>)         <span class="cm"># obligatorio para IDLE</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> TfidfVectorizer
+<span class="kw">from</span> sklearn.ensemble        <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.pipeline        <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> (
+    StratifiedKFold,
+    cross_val_score,
+)
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> f1_score
+<span class="kw">import</span> joblib
+
+<span class="fn">print</span>(<span class="st">"✅  Importaciones OK"</span>)
+</pre>
+  </div>
+
+  <!-- ── CÓDIGO BLOQUE 2: DATASET + CONFIG ─────────── -->
+  <div class="code-label" style="margin-top:12px">Bloque 2 · Dataset y zona de configuración</div>
+  <div class="code-block">
+<pre>
+<span class="cm"># ── FUNCIÓN AUXILIAR ──────────────────────────────────────</span>
+<span class="cm"># NOTA: copia TAMBIÉN crear_dataset() del Módulo 1 aquí</span>
+<span class="cm"># (para que este archivo sea completamente independiente)</span>
+
+<span class="kw">def</span> <span class="fn">limpiar_texto</span>(texto):
+    texto = texto.<span class="fn">lower</span>()
+    texto = re.<span class="fn">sub</span>(<span class="st">r"[^a-záéíóúüñ\s]"</span>, <span class="st">" "</span>, texto)
+    texto = re.<span class="fn">sub</span>(<span class="st">r"\s+"</span>, <span class="st">" "</span>, texto).<span class="fn">strip</span>()
+    <span class="kw">return</span> texto
+
+
+<span class="cm"># ── ZONA DE CONFIGURACIÓN ─────────────────────────────────</span>
+
+RANDOM_STATE = <span class="nm">42</span>
+N_SPLITS     = <span class="nm">5</span>     <span class="cm"># pliegues de cross-validation</span>
+
+CONFIGURACIONES = [
+    {
+        <span class="st">"nombre"</span>       : <span class="st">"C1 — Base (M1 default)"</span>,
+        <span class="st">"max_features"</span> : <span class="nm">500</span>,
+        <span class="st">"ngram_range"</span>  : (<span class="nm">1</span>, <span class="nm">2</span>),
+        <span class="st">"n_estimators"</span> : <span class="nm">100</span>,
+        <span class="st">"max_depth"</span>    : <span class="kw">None</span>,
+        <span class="st">"min_leaf"</span>     : <span class="nm">1</span>,
+    },
+    {
+        <span class="st">"nombre"</span>       : <span class="st">"C2 — +vocabulario"</span>,
+        <span class="st">"max_features"</span> : <span class="nm">1000</span>,
+        <span class="st">"ngram_range"</span>  : (<span class="nm">1</span>, <span class="nm">2</span>),
+        <span class="st">"n_estimators"</span> : <span class="nm">100</span>,
+        <span class="st">"max_depth"</span>    : <span class="kw">None</span>,
+        <span class="st">"min_leaf"</span>     : <span class="nm">1</span>,
+    },
+    {
+        <span class="st">"nombre"</span>       : <span class="st">"C3 — Profundidad limitada"</span>,
+        <span class="st">"max_features"</span> : <span class="nm">500</span>,
+        <span class="st">"ngram_range"</span>  : (<span class="nm">1</span>, <span class="nm">2</span>),
+        <span class="st">"n_estimators"</span> : <span class="nm">100</span>,
+        <span class="st">"max_depth"</span>    : <span class="nm">10</span>,
+        <span class="st">"min_leaf"</span>     : <span class="nm">2</span>,
+    },
+    {
+        <span class="st">"nombre"</span>       : <span class="st">"C4 — Más árboles"</span>,
+        <span class="st">"max_features"</span> : <span class="nm">500</span>,
+        <span class="st">"ngram_range"</span>  : (<span class="nm">1</span>, <span class="nm">2</span>),
+        <span class="st">"n_estimators"</span> : <span class="nm">200</span>,
+        <span class="st">"max_depth"</span>    : <span class="kw">None</span>,
+        <span class="st">"min_leaf"</span>     : <span class="nm">1</span>,
+    },
+    {
+        <span class="st">"nombre"</span>       : <span class="st">"C5 — Regularizada"</span>,
+        <span class="st">"max_features"</span> : <span class="nm">800</span>,
+        <span class="st">"ngram_range"</span>  : (<span class="nm">1</span>, <span class="nm">2</span>),
+        <span class="st">"n_estimators"</span> : <span class="nm">150</span>,
+        <span class="st">"max_depth"</span>    : <span class="nm">8</span>,
+        <span class="st">"min_leaf"</span>     : <span class="nm">3</span>,
+    },
+    {
+        <span class="st">"nombre"</span>       : <span class="st">"C6 — Mi hipótesis"</span>,
+        <span class="st">"max_features"</span> : <span class="nm">500</span>,   <span class="cm"># ← MODIFICA con tu hipótesis</span>
+        <span class="st">"ngram_range"</span>  : (<span class="nm">1</span>, <span class="nm">2</span>),
+        <span class="st">"n_estimators"</span> : <span class="nm">100</span>,   <span class="cm"># ← MODIFICA</span>
+        <span class="st">"max_depth"</span>    : <span class="kw">None</span>, <span class="cm"># ← MODIFICA</span>
+        <span class="st">"min_leaf"</span>     : <span class="nm">1</span>,    <span class="cm"># ← MODIFICA</span>
+    },
+]
+</pre>
+  </div>
+
+  <!-- ── CÓDIGO BLOQUE 3: FUNCIÓN COMPARAR ──────────── -->
+  <div class="code-label" style="margin-top:12px">Bloque 3 · Función de comparación con Pipeline + CV</div>
+  <div class="code-block">
+<pre>
+<span class="kw">def</span> <span class="fn">comparar_configuraciones</span>(textos, etiquetas):
+    <span class="st">"""
+    Entrena y evalúa cada config con
+    cross-validation estratificada de 5 pliegues.
+    Usa Pipeline para evitar contaminación de datos.
+    """</span>
+    textos_limpios = [
+        <span class="fn">limpiar_texto</span>(t) <span class="kw">for</span> t <span class="kw">in</span> textos
+    ]
+
+    cv = <span class="fn">StratifiedKFold</span>(
+        n_splits     = N_SPLITS,
+        shuffle      = <span class="kw">True</span>,
+        random_state = RANDOM_STATE,
+    )
+
+    resultados = []
+    sep = <span class="st">"="</span> * <span class="nm">64</span>
+
+    <span class="fn">print</span>(sep)
+    <span class="fn">print</span>(<span class="st">"  EMOSENSE — COMPARACIÓN DE CONFIGURACIONES"</span>)
+    <span class="fn">print</span>(<span class="st">f"  Cross-Validation: {N_SPLITS} pliegues"</span>)
+    <span class="fn">print</span>(sep)
+
+    <span class="kw">for</span> cfg <span class="kw">in</span> CONFIGURACIONES:
+
+        <span class="cm"># Pipeline encadena TF-IDF + Random Forest</span>
+        <span class="cm"># El vocabulario se ajusta DENTRO de cada pliegue</span>
+        pipeline = <span class="fn">Pipeline</span>([
+            (<span class="st">"tfidf"</span>, <span class="fn">TfidfVectorizer</span>(
+                max_features = cfg[<span class="st">"max_features"</span>],
+                ngram_range  = cfg[<span class="st">"ngram_range"</span>],
+            )),
+            (<span class="st">"clf"</span>, <span class="fn">RandomForestClassifier</span>(
+                n_estimators     = cfg[<span class="st">"n_estimators"</span>],
+                max_depth        = cfg[<span class="st">"max_depth"</span>],
+                min_samples_leaf = cfg[<span class="st">"min_leaf"</span>],
+                random_state     = RANDOM_STATE,
+            )),
+        ])
+
+        scores = <span class="fn">cross_val_score</span>(
+            pipeline,
+            textos_limpios,
+            etiquetas,
+            cv      = cv,
+            scoring = <span class="st">"f1_weighted"</span>,
+        )
+
+        media = scores.<span class="fn">mean</span>()
+        std   = scores.<span class="fn">std</span>()
+
+        resultados.<span class="fn">append</span>({
+            <span class="st">"nombre"</span>  : cfg[<span class="st">"nombre"</span>],
+            <span class="st">"media"</span>   : media,
+            <span class="st">"std"</span>     : std,
+            <span class="st">"cfg"</span>     : cfg,
+        })
+
+        <span class="fn">print</span>(
+            <span class="st">f"  {cfg['nombre']:<28} "</span>
+            <span class="st">f"F1 = {media:.4f} ± {std:.4f}"</span>
+        )
+
+    <span class="fn">print</span>(sep)
+    mejor = <span class="fn">max</span>(resultados, key=<span class="kw">lambda</span> r: r[<span class="st">"media"</span>])
+    <span class="fn">print</span>(<span class="st">f"\n  🏆 MEJOR CONFIG : {mejor['nombre']}"</span>)
+    <span class="fn">print</span>(<span class="st">f"     F1 CV media  : {mejor['media']:.4f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"     F1 CV std    : {mejor['std']:.4f}"</span>)
+
+    <span class="kw">return</span> resultados, mejor
+</pre>
+  </div>
+
+  <!-- ── CÓDIGO BLOQUE 4: GUARDAR + GRÁFICA + MAIN ── -->
+  <div class="code-label" style="margin-top:12px">Bloque 4 · Guardar modelo óptimo + gráfica + main</div>
+  <div class="code-block">
+<pre>
+<span class="kw">def</span> <span class="fn">guardar_mejor</span>(mejor, textos, etiquetas):
+    <span class="st">"""
+    Reentrena la mejor config con TODOS los datos
+    (sin partición train/test) y guarda el pipeline.
+    Este archivo .pkl lo usará el Módulo 3.
+    """</span>
+    textos_limpios = [<span class="fn">limpiar_texto</span>(t) <span class="kw">for</span> t <span class="kw">in</span> textos]
+    cfg = mejor[<span class="st">"cfg"</span>]
+
+    <span class="hi">pipeline_final = <span class="fn">Pipeline</span>([         <span class="cm"># ← con TODOS los datos</span></span>
+    <span class="hi">    (<span class="st">"tfidf"</span>, <span class="fn">TfidfVectorizer</span>(</span>
+    <span class="hi">        max_features = cfg[<span class="st">"max_features"</span>],</span>
+    <span class="hi">        ngram_range  = cfg[<span class="st">"ngram_range"</span>],</span>
+    <span class="hi">    )),</span>
+    <span class="hi">    (<span class="st">"clf"</span>, <span class="fn">RandomForestClassifier</span>(</span>
+    <span class="hi">        n_estimators     = cfg[<span class="st">"n_estimators"</span>],</span>
+    <span class="hi">        max_depth        = cfg[<span class="st">"max_depth"</span>],</span>
+    <span class="hi">        min_samples_leaf = cfg[<span class="st">"min_leaf"</span>],</span>
+    <span class="hi">        random_state     = RANDOM_STATE,</span>
+    <span class="hi">    )),</span>
+    <span class="hi">])</span>
+    pipeline_final.<span class="fn">fit</span>(textos_limpios, etiquetas)
+
+    <span class="kw">if</span> <span class="kw">not</span> os.path.<span class="fn">exists</span>(<span class="st">"modelos"</span>):
+        os.<span class="fn">makedirs</span>(<span class="st">"modelos"</span>)
+
+    ruta = os.path.<span class="fn">join</span>(<span class="st">"modelos"</span>, <span class="st">"modelo_optimo.pkl"</span>)
+    joblib.<span class="fn">dump</span>(pipeline_final, ruta)
+    <span class="fn">print</span>(<span class="st">f"\n  ✅ Modelo guardado → {ruta}"</span>)
+    <span class="fn">print</span>(<span class="st">"  El Módulo 3 lo cargará con joblib.load()"</span>)
+
+
+<span class="kw">def</span> <span class="fn">graficar_comparacion</span>(resultados, carpeta=<span class="st">"graficas"</span>):
+    <span class="st">"""Gráfica de barras de F1 CV por configuración."""</span>
+    <span class="kw">if</span> <span class="kw">not</span> os.path.<span class="fn">exists</span>(carpeta):
+        os.<span class="fn">makedirs</span>(carpeta)
+
+    nombres = [r[<span class="st">"nombre"</span>] <span class="kw">for</span> r <span class="kw">in</span> resultados]
+    medias  = [r[<span class="st">"media"</span>]  <span class="kw">for</span> r <span class="kw">in</span> resultados]
+    stds    = [r[<span class="st">"std"</span>]    <span class="kw">for</span> r <span class="kw">in</span> resultados]
+
+    mejor_idx = medias.<span class="fn">index</span>(<span class="fn">max</span>(medias))
+    colores   = [
+        <span class="st">"#7c6af7"</span> <span class="kw">if</span> i == mejor_idx <span class="kw">else</span> <span class="st">"#3a3a48"</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(nombres))
+    ]
+
+    fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nm">10</span>, <span class="nm">5</span>))
+    ax.<span class="fn">bar</span>(
+        <span class="fn">range</span>(<span class="fn">len</span>(nombres)), medias,
+        color=colores, yerr=stds,
+        capsize=<span class="nm">5</span>, alpha=<span class="nm">0.88</span>, edgecolor=<span class="st">"#1e1e24"</span>,
+    )
+
+    <span class="kw">for</span> i, (m, s) <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">zip</span>(medias, stds)):
+        ax.<span class="fn">text</span>(i, m + s + <span class="nm">0.01</span>,
+                <span class="st">f"{m:.3f}"</span>, ha=<span class="st">"center"</span>,
+                fontsize=<span class="nm">9</span>, fontweight=<span class="st">"bold"</span>)
+
+    ax.<span class="fn">set_xticks</span>(<span class="fn">range</span>(<span class="fn">len</span>(nombres)))
+    ax.<span class="fn">set_xticklabels</span>(
+        nombres, rotation=<span class="nm">20</span>,
+        ha=<span class="st">"right"</span>, fontsize=<span class="nm">9</span>,
+    )
+    ax.<span class="fn">set_ylim</span>(<span class="nm">0.5</span>, <span class="nm">1.05</span>)
+    ax.<span class="fn">set_ylabel</span>(<span class="st">"F1-Score weighted (CV)"</span>)
+    ax.<span class="fn">set_title</span>(
+        <span class="st">"EmoSense — F1 por configuración\n"</span>
+        <span class="st">"(media ± desv. estándar · 5 pliegues)"</span>,
+        fontsize=<span class="nm">11</span>,
+    )
+    ax.<span class="fn">axhline</span>(<span class="nm">0.80</span>, color=<span class="st">"gray"</span>,
+               linestyle=<span class="st">"--"</span>, linewidth=<span class="nm">0.8</span>)
+    ax.<span class="fn">grid</span>(axis=<span class="st">"y"</span>, alpha=<span class="nm">0.3</span>)
+    plt.<span class="fn">tight_layout</span>()
+
+    ruta = os.path.<span class="fn">join</span>(carpeta, <span class="st">"comparacion_configs.png"</span>)
+    plt.<span class="fn">savefig</span>(ruta, dpi=<span class="nm">120</span>, bbox_inches=<span class="st">"tight"</span>)
+    <span class="fn">print</span>(<span class="st">f"  Gráfica guardada → {ruta}"</span>)
+    plt.<span class="fn">show</span>()
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    <span class="fn">print</span>(<span class="st">"\n"</span> + <span class="st">"="</span> * <span class="nm">64</span>)
+    <span class="fn">print</span>(<span class="st">"  EMOSENSE — MÓDULO 2: OPTIMIZACIÓN"</span>)
+    <span class="fn">print</span>(<span class="st">"="</span> * <span class="nm">64</span> + <span class="st">"\n"</span>)
+
+    textos, etiquetas = <span class="fn">crear_dataset</span>()   <span class="cm"># del Módulo 1</span>
+    <span class="fn">print</span>(<span class="st">f"  Dataset: {len(textos)} frases · "</span>
+          <span class="st">f"{len(set(etiquetas))} emociones\n"</span>)
+
+    resultados, mejor = <span class="fn">comparar_configuraciones</span>(
+        textos, etiquetas
+    )
+
+    <span class="fn">print</span>(<span class="st">"\n  Generando gráfica..."</span>)
+    <span class="fn">graficar_comparacion</span>(resultados)
+
+    <span class="fn">print</span>(<span class="st">"\n  Guardando modelo óptimo..."</span>)
+    <span class="fn">guardar_mejor</span>(mejor, textos, etiquetas)
+
+    <span class="fn">print</span>(<span class="st">"\n  Archivos generados:"</span>)
+    <span class="fn">print</span>(<span class="st">"    modelos/modelo_optimo.pkl"</span>)
+    <span class="fn">print</span>(<span class="st">"    graficas/comparacion_configs.png"</span>)
+    <span class="fn">print</span>(<span class="st">"\n  Siguiente → Módulo 3: Chat con tkinter"</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="fn">main</span>()
+
+<span class="fn">input</span>(<span class="st">"\n  Presiona Enter para cerrar... "</span>)
+</pre>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       CAPTURA DE RESULTADOS
+  ════════════════════════════════════════════════ -->
+  <div class="section-title">Tus resultados — registra antes de continuar</div>
+
+  <div class="context-box">
+    <div class="ctx-title">Después de ejecutar el código en IDLE</div>
+    <p>
+      Copia aquí los valores que viste en la Shell de IDLE.
+      Los necesitarás para responder las preguntas de evaluación.
+      Esta sección <strong>no se califica</strong> automáticamente.
+    </p>
+  </div>
+
+  <div class="question-card">
+    <div class="q-number">Datos de tu ejecución</div>
+    <div class="results-grid">
+      <div class="res-field">
+        <label>Mejor configuración (nombre)</label>
+        <input type="text" id="r-mejor"
+               placeholder="Ej: C5 — Regularizada">
+      </div>
+      <div class="res-field">
+        <label>F1 CV de la mejor config</label>
+        <input type="text" id="r-f1"
+               placeholder="Ej: 0.8234">
+      </div>
+      <div class="res-field">
+        <label>Emoción con F1 más bajo</label>
+        <input type="text" id="r-baja"
+               placeholder="Ej: asco o sorpresa">
+      </div>
+      <div class="res-field">
+        <label>¿Tu hipótesis (C6) superó a C1?</label>
+        <input type="text" id="r-hip"
+               placeholder="Sí / No y diferencia">
+      </div>
+      <div class="res-field">
+        <label>F1 CV de tu Config 6</label>
+        <input type="text" id="r-c6"
+               placeholder="Ej: 0.7892">
+      </div>
+      <div class="res-field">
+        <label>Desv. estándar del mejor config</label>
+        <input type="text" id="r-std"
+               placeholder="Ej: 0.0321">
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       EVALUACIÓN — 10 PREGUNTAS
+  ════════════════════════════════════════════════ -->
+  <div class="section-title">Evaluación conceptual</div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="prog-fill"></div>
+    </div>
+    <span class="progress-label" id="prog-label">0 / 10 respondidas</span>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="qc1">
+    <div class="q-number">Pregunta 01 · 10 pts</div>
+    <div class="q-text">
+      Para comparar las 6 configuraciones de EmoSense,
+      la métrica más adecuada es:
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q1" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">Accuracy global (% de aciertos sobre el total)</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q1" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">F1-Score weighted con cross-validation — da un estimado confiable del rendimiento real</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q1" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">Recall únicamente de la emoción con más muestras en el dataset</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q1" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">Tiempo de entrenamiento de cada configuración</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="qc2">
+    <div class="q-number">Pregunta 02 · 10 pts</div>
+    <div class="q-text">
+      ¿Por qué usamos <code style="font-family:var(--font-mono);color:var(--cyan)">Pipeline(TF-IDF, RF)</code>
+      dentro de <code style="font-family:var(--font-mono);color:var(--cyan)">cross_val_score()</code>
+      en lugar de vectorizar el texto fuera del CV?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q2" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">Para que el entrenamiento sea más rápido al reusar el vocabulario</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q2" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">Previene contaminación de datos: el vocabulario se aprende dentro de cada pliegue, no con información del conjunto de validación</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q2" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">Pipeline limita automáticamente max_depth para evitar sobreajuste</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q2" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">Es requerimiento de sklearn para modelos de más de 2 clases</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="qc3">
+    <div class="q-number">Pregunta 03 · 10 pts</div>
+    <div class="q-text">
+      En el pipeline TF-IDF + Random Forest, ¿cuál de estos
+      es un <strong>parámetro</strong> (aprende el modelo) y NO
+      un hiperparámetro?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q3" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">max_features del TfidfVectorizer</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q3" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">n_estimators del RandomForestClassifier</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q3" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">El peso TF-IDF de cada palabra en el vector (se calcula durante el fit)</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q3" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">ngram_range del TfidfVectorizer</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="qc4">
+    <div class="q-number">Pregunta 04 · 10 pts</div>
+    <div class="q-text">
+      <code style="font-family:var(--font-mono);color:var(--cyan)">StratifiedKFold</code>
+      garantiza que cada pliegue:
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q4" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">Tenga exactamente el mismo número de muestras de entrenamiento</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q4" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">Contenga muestras de todas las emociones en proporciones similares, evitando pliegues con clases ausentes</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q4" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">Elimine el sobreajuste del modelo completamente</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q4" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">Use datos distintos en cada llamada a cross_val_score()</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="qc5">
+    <div class="q-number">Pregunta 05 · 10 pts</div>
+    <div class="q-text">
+      Si C3 (max_depth=10, min_leaf=2) obtiene mejor F1 CV
+      que C1 (max_depth=None, min_leaf=1), ¿qué indica para EmoSense?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q5" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">Se necesitan más frases de entrenamiento antes de ajustar hiperparámetros</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q5" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">Controlar la profundidad reduce el sobreajuste y mejora la generalización en la clasificación de emociones</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q5" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">El vocabulario TF-IDF de 500 palabras es insuficiente para el español emocional</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q5" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">Random Forest sin límite de profundidad siempre produce sobreajuste sin importar el dataset</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="qc6">
+    <div class="q-number">Pregunta 06 · 10 pts</div>
+    <div class="q-text">
+      ¿Cuál de estas situaciones indica sobreajuste
+      claro en una configuración de EmoSense?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q6" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">F1 CV = 0.87, F1 en un split único = 0.88  (diferencia < 0.02)</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q6" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">F1 CV = 0.62, F1 en entrenamiento = 0.99  (diferencia > 0.35)</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q6" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">F1 CV = 0.75, F1 en entrenamiento = 0.78  (diferencia < 0.03)</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q6" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">F1 CV = 0.70, F1 en entrenamiento = 0.72  (ambos bajos)</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="qc7">
+    <div class="q-number">Pregunta 07 · 10 pts</div>
+    <div class="q-text">
+      La emoción "asco" tiene F1 más bajo que las demás
+      en casi todas las configs. La causa más probable es:
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q7" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">La palabra "asco" no entra dentro del vocabulario TF-IDF de 500 palabras</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q7" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">Las frases de asco comparten vocabulario con enojo (rechazo, indignación), lo que confunde al clasificador entre clases similares</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q7" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">El dataset tiene demasiadas frases de asco en comparación con las demás emociones</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q7" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">max_depth controla directamente cuántas emociones puede aprender el modelo</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="qc8">
+    <div class="q-number">Pregunta 08 · 10 pts</div>
+    <div class="q-text">
+      Después de elegir la mejor config con cross-validation,
+      la función <code style="font-family:var(--font-mono);color:var(--cyan)">guardar_mejor()</code>
+      reentrena el pipeline con <em>todos los datos disponibles</em>.
+      ¿Por qué es importante ese detalle?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q8" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">Para que el modelo final aprenda de más ejemplos y generalice mejor en producción (el chat)</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q8" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">Porque joblib.dump() solo funciona con modelos entrenados en el dataset completo</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q8" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">Para aumentar el tamaño del archivo .pkl y hacerlo más robusto</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q8" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">Para que el archivo sea independiente del vectorizador TF-IDF</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="qc9">
+    <div class="q-number">Pregunta 09 · 10 pts</div>
+    <div class="q-text">
+      El objeto que guarda <code style="font-family:var(--font-mono);color:var(--cyan)">modelo_optimo.pkl</code>
+      es un <code style="font-family:var(--font-mono);color:var(--cyan)">Pipeline</code>.
+      ¿Qué ventaja tiene guardar el Pipeline completo
+      en lugar de solo el RandomForestClassifier?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q9" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">El Módulo 3 puede recibir texto crudo directamente: pipeline.predict(["Me siento triste"]) sin preprocesar</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q9" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">El Pipeline ocupa menos espacio en disco que dos archivos separados</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q9" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">Solo los Pipelines son compatibles con la función joblib.load()</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q9" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">El Pipeline guarda las 180 frases del dataset para re-entrenar automáticamente</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question-card" id="qc10">
+    <div class="q-number">Pregunta 10 · 10 pts</div>
+    <div class="q-text">
+      ¿Cuál es la diferencia fundamental entre el Módulo 1
+      y el Módulo 2 del proyecto EmoSense?
+    </div>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="q10" value="a">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">A</span>
+        <span class="opt-text">En el Módulo 2 se usa un algoritmo de clasificación diferente al del Módulo 1</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q10" value="b">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">B</span>
+        <span class="opt-text">El Módulo 1 construye el pipeline base con parámetros fijos; el Módulo 2 busca sistemáticamente la mejor combinación de hiperparámetros mediante experimentación controlada con CV</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q10" value="c">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">C</span>
+        <span class="opt-text">El Módulo 2 crea un dataset más grande y cambia el idioma de clasificación a inglés</span>
+      </label>
+      <label class="option">
+        <input type="radio" name="q10" value="d">
+        <span class="opt-dot"></span>
+        <span class="opt-letter">D</span>
+        <span class="opt-text">En el Módulo 2 se reemplaza TF-IDF por Word2Vec para mejor comprensión del español</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- ENVIAR -->
+  <div class="submit-wrap">
+    <button class="btn btn-primary btn-block"
+            id="submit-btn"
+            onclick="submitEval()">
+      Entregar evaluación
+    </button>
+    <div class="submit-note">
+      Responde todas las preguntas antes de enviar.
+      La evaluación solo puede enviarse una vez.
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="result-panel">
+    <h2>Resultado del Módulo 2</h2>
+    <span id="res-score">—</span>
+    <div id="res-pct">de 100 puntos</div>
+    <div id="res-rank-wrap"></div>
+    <div id="res-name"></div>
+    <div id="res-meta"></div>
+    <div id="res-infr"></div>
+    <div class="breakdown mt24">
+      <h3>Desglose de respuestas</h3>
+      <div id="bd-list"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ALERT OVERLAY -->
+<div id="alert-overlay">
+  <div class="alert-box">
+    <div class="alert-icon">⚠️</div>
+    <h3>Cambio de pestaña detectado</h3>
+    <p>
+      Salir de esta página durante la evaluación
+      registra una infracción. Mantente en esta pestaña.
+    </p>
+    <button class="btn btn-secondary"
+            onclick="closeAlert()">
+      Entendido
+    </button>
+  </div>
+</div>
+
+<!-- ── JAVASCRIPT ─────────────────────────────────────── -->
+<script>
+/* ═══ CONFIGURACIÓN ════════════════════════════════════ */
+const TOTAL_MINS  = 90;
+const QUESTIONS   = 10;
+const PTS_EACH    = 10;
+
+const CORRECT = {
+  q1: 'b', q2: 'b', q3: 'c',
+  q4: 'b', q5: 'b', q6: 'b',
+  q7: 'b', q8: 'a', q9: 'a',
+  q10: 'b',
+};
+
+const Q_TEXTS = [
+  'Métrica para comparar configuraciones',
+  'Por qué usar Pipeline dentro de CV',
+  'Parámetro vs hiperparámetro en TF-IDF + RF',
+  'Qué garantiza StratifiedKFold',
+  'C3 mejor que C1 — qué indica',
+  'Cuál situación indica sobreajuste',
+  'Por qué "asco" tiene F1 bajo',
+  'Por qué reentrenar con todos los datos',
+  'Ventaja de guardar el Pipeline completo',
+  'Diferencia Módulo 1 vs Módulo 2',
+];
+
+const OPT_LABELS = ['A','B','C','D'];
+
+/* ═══ ESTADO ════════════════════════════════════════════ */
+let answers    = {};
+let submitted  = false;
+let infractions= 0;
+let timerInt   = null;
+let seconds    = TOTAL_MINS * 60;
+
+/* ═══ TIMER ════════════════════════════════════════════ */
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function startTimer() {
+  const el = document.getElementById('timer');
+  timerInt = setInterval(() => {
+    seconds--;
+    el.textContent = fmtTime(seconds);
+    if (seconds <= 300 && seconds > 60) {
+      el.className = 'warn';
+    } else if (seconds <= 60) {
+      el.className = 'danger';
+    }
+    if (seconds <= 0) {
+      clearInterval(timerInt);
+      if (!submitted) submitEval();
+    }
+  }, 1000);
+}
+
+/* ═══ PROGRESO ══════════════════════════════════════════ */
+function updateProgress() {
+  const n   = Object.keys(answers).length;
+  const pct = (n / QUESTIONS) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent =
+    n + ' / ' + QUESTIONS + ' respondidas';
+}
+
+/* ═══ SELECCIÓN DE OPCIÓN ══════════════════════════════ */
+document.querySelectorAll('.option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    if (submitted) return;
+    const radio = opt.querySelector('input[type="radio"]');
+    if (!radio) return;
+    radio.checked = true;
+
+    const name = radio.name;
+    answers[name] = radio.value;
+
+    const card = opt.closest('.question-card');
+    if (card) card.classList.add('answered');
+
+    updateProgress();
+  });
+});
+
+/* ═══ ENVIAR ════════════════════════════════════════════ */
+function submitEval() {
+  if (submitted) return;
+
+  const nombre = document.getElementById('inp-nombre')
+    .value.trim();
+  if (!nombre) {
+    alert('Por favor escribe tu nombre antes de enviar.');
+    return;
+  }
+
+  const unanswered = QUESTIONS -
+    Object.keys(answers).length;
+  if (unanswered > 0) {
+    const ok = confirm(
+      'Tienes ' + unanswered +
+      ' pregunta(s) sin responder. ¿Enviar de todas formas?'
+    );
+    if (!ok) return;
+  }
+
+  submitted = true;
+  clearInterval(timerInt);
+  document.getElementById('submit-btn').disabled = true;
+
+  let score = 0;
+  const bdHtml = [];
+
+  for (let i = 1; i <= QUESTIONS; i++) {
+    const key    = 'q' + i;
+    const chosen = answers[key] || null;
+    const correct= CORRECT[key];
+    const ok     = chosen === correct;
+
+    if (ok) score += PTS_EACH;
+
+    const chosenLbl = chosen
+      ? OPT_LABELS['abcd'.indexOf(chosen)]
+      : '—';
+    const correctLbl= OPT_LABELS['abcd'.indexOf(correct)];
+
+    bdHtml.push(
+      '<div class="bd-row">' +
+      '<span class="bd-num">P' +
+        String(i).padStart(2, '0') + '</span>' +
+      '<span class="bd-text">' +
+        Q_TEXTS[i - 1] +
+        '<div class="bd-sel">Tu respuesta: ' +
+          chosenLbl + '</div>' +
+        (ok ? '' :
+          '<div class="bd-ans">Correcta: ' +
+          correctLbl + '</div>') +
+      '</span>' +
+      '<span class="bd-status ' + (ok ? 'ok' : 'fail') + '">' +
+        (ok ? '✓ +' + PTS_EACH : '✗ 0') +
+      '</span>' +
+      '</div>'
+    );
+  }
+
+  /* Mostrar resultado */
+  const pct = Math.round(score / QUESTIONS / PTS_EACH * 100);
+  const grupo = document.getElementById('inp-grupo')
+    .value.trim() || '—';
+
+  const rank = score >= 90 ? ['S', 'rank-s'] :
+               score >= 75 ? ['A', 'rank-a'] :
+               score >= 60 ? ['B', 'rank-b'] :
+                             ['C', 'rank-c'];
+
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-pct').textContent =
+    'de 100 puntos (' + pct + '%)';
+  document.getElementById('res-rank-wrap').innerHTML =
+    '<span class="result-rank ' + rank[1] + '">' +
+    'RANGO ' + rank[0] + '</span>';
+  document.getElementById('res-name').textContent = nombre;
+  document.getElementById('res-meta').textContent =
+    'Grupo: ' + grupo + ' · EmoSense Módulo 2';
+  if (infractions > 0) {
+    document.getElementById('res-infr').textContent =
+      '⚠ ' + infractions + ' infracción(es) registrada(s)';
+  }
+  document.getElementById('bd-list').innerHTML =
+    bdHtml.join('');
+  document.getElementById('result-panel').style.display = 'block';
+  document.getElementById('result-panel').scrollIntoView(
+    { behavior: 'smooth' }
+  );
+}
+
+/* ═══ INFRACCIONES ══════════════════════════════════════ */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && !submitted) {
+    infractions++;
+    const badge = document.getElementById('infraction-badge');
+    document.getElementById('infr-count').textContent =
+      infractions;
+    badge.classList.add('visible');
+    document.getElementById('alert-overlay')
+      .classList.add('show');
+  }
+});
+
+function closeAlert() {
+  document.getElementById('alert-overlay')
+    .classList.remove('show');
+}
+
+/* ═══ TEMA ══════════════════════════════════════════════ */
+function toggleTheme() {
+  const isDark =
+    !document.documentElement.hasAttribute('data-theme');
+  document.documentElement.setAttribute(
+    'data-theme', isDark ? 'light' : ''
+  );
+  document.getElementById('theme-toggle').textContent =
+    isDark ? '🌙' : '☀️';
+}
+
+/* ═══ INIT ══════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  startTimer();
+  updateProgress();
+  document.getElementById('inp-fecha').value =
+    new Date().toLocaleDateString('es-MX');
+});
+</script>
+</body>
+</html>
