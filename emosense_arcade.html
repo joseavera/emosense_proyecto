@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmoSense Arcade</title>
+<style>
+/* ════ RESET ════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#090914;--s1:#10101e;--s2:#16162a;--s3:#1e1e35;
+  --brd:#2e2e4a;--brd2:#3e3e5a;
+  --txt:#e8e4ff;--txt2:#8882b5;--txt3:#4e4a6a;
+  --acc:#7c6af7;--acc2:#a89cf9;
+  --joy:#f59e0b;--sad:#3b82f6;--ang:#ef4444;
+  --fea:#a855f7;--sur:#10b981;--dis:#84cc16;
+  --joy-b:rgba(245,158,11,.12);
+  --sad-b:rgba(59,130,246,.12);
+  --ang-b:rgba(239,68,68,.12);
+  --fea-b:rgba(168,85,247,.12);
+  --sur-b:rgba(16,185,129,.12);
+  --dis-b:rgba(132,204,22,.12);
+  --green:#22c55e;--red:#ef4444;
+  --r:14px;--rs:8px;
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--txt);
+     display:flex;align-items:center;
+     justify-content:center}
+
+/* ════ PANTALLAS ════════════════════════════════════ */
+.screen{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  transition:opacity .35s,transform .35s;
+}
+.screen.off{
+  opacity:0;pointer-events:none;
+  transform:scale(.97);
+}
+
+/* ════ PANTALLA INICIO ══════════════════════════════ */
+#sc-start{gap:22px;text-align:center}
+.game-logo{
+  font-size:clamp(36px,7vw,64px);
+  font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--acc2),var(--joy));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  line-height:1;margin-bottom:4px;
+}
+.game-sub{
+  font-size:13px;color:var(--txt2);
+  letter-spacing:.15em;text-transform:uppercase;
+  margin-top:-8px;margin-bottom:4px;
+}
+.rules-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;max-width:480px;width:100%;
+}
+.rule-card{
+  background:var(--s2);border:1px solid var(--brd);
+  border-radius:var(--r);padding:14px 16px;
+  text-align:left;
+}
+.rule-icon{font-size:20px;margin-bottom:6px}
+.rule-title{
+  font-size:12px;font-weight:700;
+  color:var(--acc2);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:3px;
+}
+.rule-text{font-size:13px;color:var(--txt2);line-height:1.5}
+
+.emotion-legend{
+  display:flex;gap:8px;flex-wrap:wrap;
+  justify-content:center;max-width:480px;
+}
+.emo-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--s2);border:1px solid var(--brd);
+  border-radius:99px;padding:4px 12px;
+  font-size:12.5px;
+}
+
+.btn-start{
+  background:var(--acc);color:#fff;
+  border:none;border-radius:var(--r);
+  padding:15px 48px;font-size:17px;
+  font-weight:700;cursor:pointer;
+  letter-spacing:.05em;
+  box-shadow:0 0 32px rgba(124,106,247,.45);
+  transition:all .15s;
+}
+.btn-start:hover{
+  background:var(--acc2);
+  transform:translateY(-2px);
+  box-shadow:0 4px 40px rgba(124,106,247,.6);
+}
+
+/* ════ PANTALLA DE JUEGO ════════════════════════════ */
+#sc-game{justify-content:flex-start;padding:0;gap:0}
+
+/* HUD */
+#hud{
+  width:100%;background:var(--s1);
+  border-bottom:1px solid var(--brd);
+  padding:10px 20px;
+  display:flex;align-items:center;gap:16px;
+  flex-shrink:0;
+}
+#lives{font-size:18px;letter-spacing:2px}
+#hud-level{
+  font-family:monospace;font-size:10px;
+  color:var(--acc2);letter-spacing:.15em;
+  text-transform:uppercase;background:var(--s3);
+  border:1px solid var(--acc);
+  border-radius:99px;padding:3px 10px;
+}
+#hud-score{
+  font-size:20px;font-weight:700;
+  color:var(--txt);margin-left:auto;
+}
+#combo{
+  font-size:13px;font-weight:700;
+  color:var(--joy);
+  min-width:32px;text-align:center;
+}
+
+/* Barra de tiempo */
+#timer-wrap{
+  width:100%;height:5px;
+  background:var(--s3);flex-shrink:0;
+}
+#timer-fill{
+  height:100%;width:100%;
+  background:var(--acc);
+  transition:background .3s;
+}
+
+/* Dificultad */
+#diff-badge{
+  font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:3px 10px;border-radius:99px;
+  font-weight:700;margin-top:16px;
+  flex-shrink:0;
+}
+.diff-1{background:rgba(34,197,94,.15);color:var(--green)}
+.diff-2{background:rgba(245,158,11,.15);color:var(--joy)}
+.diff-3{background:rgba(239,68,68,.15);color:var(--red)}
+.diff-4{background:rgba(168,85,247,.15);color:var(--fea)}
+
+/* Frase */
+#phrase-wrap{
+  flex:1;display:flex;align-items:center;
+  justify-content:center;
+  width:100%;padding:10px 20px 0;
+}
+#phrase-box{
+  background:var(--s2);border:2px solid var(--brd);
+  border-radius:18px;padding:28px 36px;
+  max-width:560px;width:100%;
+  text-align:center;
+  font-size:clamp(16px,3vw,22px);
+  font-weight:500;line-height:1.55;
+  color:var(--txt);
+  transition:border-color .3s,
+             box-shadow .3s,
+             transform .2s;
+}
+#phrase-box.anim-in{
+  animation:slideIn .3s ease both;
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(-18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%,60%{transform:translateX(-8px)}
+  40%,80%{transform:translateX(8px)}
+}
+@keyframes pop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.04)}
+  100%{transform:scale(1)}
+}
+#phrase-box.wrong{
+  animation:shake .35s ease;
+  border-color:var(--red);
+  box-shadow:0 0 24px rgba(239,68,68,.35);
+}
+#phrase-box.correct{
+  animation:pop .3s ease;
+  border-color:var(--green);
+  box-shadow:0 0 24px rgba(34,197,94,.35);
+}
+
+/* Botones de emoción */
+#btn-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;padding:12px 20px 20px;
+  width:100%;max-width:580px;
+  flex-shrink:0;
+}
+.emo-btn{
+  border:2px solid;border-radius:var(--r);
+  padding:13px 8px;font-size:13px;
+  font-weight:700;cursor:pointer;
+  text-align:center;line-height:1.4;
+  transition:all .12s;background:transparent;
+  display:flex;flex-direction:column;
+  align-items:center;gap:3px;
+}
+.emo-btn .btn-emoji{font-size:22px}
+.emo-btn:hover{transform:translateY(-2px);filter:brightness(1.2)}
+.emo-btn:active{transform:translateY(0) scale(.97)}
+.emo-btn:disabled{opacity:.35;cursor:default;transform:none}
+
+.emo-btn.b-alegria {border-color:var(--joy);color:var(--joy);background:var(--joy-b)}
+.emo-btn.b-tristeza{border-color:var(--sad);color:var(--sad);background:var(--sad-b)}
+.emo-btn.b-enojo   {border-color:var(--ang);color:var(--ang);background:var(--ang-b)}
+.emo-btn.b-miedo   {border-color:var(--fea);color:var(--fea);background:var(--fea-b)}
+.emo-btn.b-sorpresa{border-color:var(--sur);color:var(--sur);background:var(--sur-b)}
+.emo-btn.b-asco    {border-color:var(--dis);color:var(--dis);background:var(--dis-b)}
+
+.emo-btn.flash-ok  {background:rgba(34,197,94,.3)!important}
+.emo-btn.flash-err {background:rgba(239,68,68,.3)!important}
+.emo-btn.flash-ans {background:rgba(34,197,94,.25)!important;border-color:var(--green)!important;color:var(--green)!important}
+
+/* Overlay feedback */
+#feedback-overlay{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:8px;pointer-events:none;z-index:50;
+  opacity:0;transition:opacity .15s;
+}
+#feedback-overlay.show{opacity:1}
+#fb-icon{font-size:56px}
+#fb-text{
+  font-size:22px;font-weight:800;
+  letter-spacing:.05em;
+}
+#fb-sub{
+  font-size:13px;color:var(--txt2);
+  max-width:340px;text-align:center;
+  line-height:1.5;
+}
+
+/* Pantalla de transición de nivel */
+#sc-level{gap:14px;text-align:center}
+.lvl-num{
+  font-size:clamp(48px,10vw,80px);
+  font-weight:900;
+  background:linear-gradient(135deg,var(--acc),var(--sur));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.lvl-name{
+  font-size:20px;font-weight:700;
+  color:var(--txt);letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.lvl-desc{font-size:14px;color:var(--txt2);max-width:360px}
+
+/* ════ PANTALLA FINAL ═══════════════════════════════ */
+#sc-end{gap:16px;overflow-y:auto;
+        padding-top:60px;padding-bottom:40px}
+
+.end-score{
+  font-size:clamp(52px,12vw,96px);
+  font-weight:900;line-height:1;
+}
+.end-rank{
+  font-size:14px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  padding:5px 20px;border-radius:99px;border:2px solid;
+}
+.rank-s{color:var(--joy);border-color:var(--joy);background:var(--joy-b)}
+.rank-a{color:var(--sur);border-color:var(--sur);background:var(--sur-b)}
+.rank-b{color:var(--acc2);border-color:var(--acc);background:rgba(124,106,247,.12)}
+.rank-c{color:var(--txt2);border-color:var(--brd2);background:transparent}
+
+.end-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;max-width:420px;width:100%;
+}
+.stat-card{
+  background:var(--s2);border:1px solid var(--brd);
+  border-radius:var(--r);padding:12px;text-align:center;
+}
+.stat-val{font-size:26px;font-weight:800;color:var(--acc2)}
+.stat-lbl{font-size:11px;color:var(--txt2);
+          text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+
+/* Matriz de confusión personal */
+#confusion-wrap{
+  background:var(--s2);border:1px solid var(--brd);
+  border-radius:var(--r);padding:18px 20px;
+  max-width:520px;width:100%;
+}
+.cm-title{
+  font-size:12px;font-weight:700;color:var(--acc2);
+  text-transform:uppercase;letter-spacing:.12em;
+  margin-bottom:12px;
+}
+.cm-row{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:9px;font-size:13px;
+}
+.cm-real{min-width:110px;color:var(--txt2)}
+.cm-arrow{color:var(--brd2)}
+.cm-pred{font-weight:700}
+.cm-count{
+  font-family:monospace;font-size:12px;
+  color:var(--red);margin-left:auto;
+  background:rgba(239,68,68,.1);
+  border-radius:99px;padding:2px 8px;
+}
+.cm-empty{
+  font-size:13px;color:var(--sur);
+  text-align:center;padding:8px 0;
+}
+
+/* Insight card */
+.insight-card{
+  background:var(--s3);border-left:3px solid var(--acc);
+  border-radius:0 var(--rs) var(--rs) 0;
+  padding:14px 16px;max-width:520px;width:100%;
+  font-size:13px;color:var(--txt2);line-height:1.65;
+}
+.insight-card strong{color:var(--txt)}
+
+.btn-replay{
+  background:transparent;color:var(--acc2);
+  border:2px solid var(--acc);border-radius:var(--r);
+  padding:12px 36px;font-size:15px;
+  font-weight:700;cursor:pointer;
+  transition:all .15s;letter-spacing:.05em;
+}
+.btn-replay:hover{background:var(--acc);color:#fff;transform:translateY(-2px)}
+
+/* ════ RESPONSIVE ═══════════════════════════════════ */
+@media(max-width:480px){
+  #btn-grid{grid-template-columns:repeat(2,1fr)}
+  .emo-btn{padding:10px 6px;font-size:12px}
+  .rules-grid{grid-template-columns:1fr}
+  .end-stats{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ PANTALLA INICIO ════════════════════════════ -->
+<div class="screen" id="sc-start">
+  <div class="game-logo">EmoSense Arcade</div>
+  <div class="game-sub">¿Puedes vencer al modelo?</div>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <div class="rule-icon">⏱</div>
+      <div class="rule-title">Tiempo límite</div>
+      <div class="rule-text">Tienes 4 segundos por frase. El reloj no espera.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">❤️</div>
+      <div class="rule-title">3 vidas</div>
+      <div class="rule-text">Cada error o tiempo agotado consume una vida.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">⚡</div>
+      <div class="rule-title">Combo</div>
+      <div class="rule-text">Aciertos consecutivos multiplican tus puntos ×2 ×3 ×4 ×5.</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-icon">🔴</div>
+      <div class="rule-title">Nivel Jefe</div>
+      <div class="rule-text">Frases ambiguas que confunden hasta a los modelos de IA.</div>
+    </div>
+  </div>
+
+  <div class="emotion-legend">
+    <div class="emo-pill">😊 Alegría</div>
+    <div class="emo-pill">😢 Tristeza</div>
+    <div class="emo-pill">😡 Enojo</div>
+    <div class="emo-pill">😨 Miedo</div>
+    <div class="emo-pill">😲 Sorpresa</div>
+    <div class="emo-pill">🤢 Asco</div>
+  </div>
+
+  <button class="btn-start" onclick="initGame()">
+    JUGAR →
+  </button>
+</div>
+
+
+<!-- ════ NIVEL TRANSITION ═══════════════════════════ -->
+<div class="screen off" id="sc-level">
+  <div class="lvl-num" id="lvl-num">2</div>
+  <div class="lvl-name" id="lvl-name">Agente</div>
+  <div class="lvl-desc" id="lvl-desc">Las frases se vuelven un poco más ambiguas.</div>
+</div>
+
+
+<!-- ════ PANTALLA DE JUEGO ══════════════════════════ -->
+<div class="screen off" id="sc-game">
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="lives">❤️❤️❤️</div>
+    <div id="hud-level">Recluta</div>
+    <div id="hud-score">0</div>
+    <div id="combo">×1</div>
+  </div>
+
+  <!-- Barra de tiempo -->
+  <div id="timer-wrap"><div id="timer-fill"></div></div>
+
+  <!-- Dificultad -->
+  <div id="diff-badge" class="diff-1">🟢 Recluta</div>
+
+  <!-- Frase -->
+  <div id="phrase-wrap">
+    <div id="phrase-box">…</div>
+  </div>
+
+  <!-- Botones de emoción -->
+  <div id="btn-grid">
+    <button class="emo-btn b-alegria"
+            onclick="pick('alegria')">
+      <span class="btn-emoji">😊</span>Alegría
+    </button>
+    <button class="emo-btn b-tristeza"
+            onclick="pick('tristeza')">
+      <span class="btn-emoji">😢</span>Tristeza
+    </button>
+    <button class="emo-btn b-enojo"
+            onclick="pick('enojo')">
+      <span class="btn-emoji">😡</span>Enojo
+    </button>
+    <button class="emo-btn b-miedo"
+            onclick="pick('miedo')">
+      <span class="btn-emoji">😨</span>Miedo
+    </button>
+    <button class="emo-btn b-sorpresa"
+            onclick="pick('sorpresa')">
+      <span class="btn-emoji">😲</span>Sorpresa
+    </button>
+    <button class="emo-btn b-asco"
+            onclick="pick('asco')">
+      <span class="btn-emoji">🤢</span>Asco
+    </button>
+  </div>
+</div>
+
+<!-- Overlay de feedback -->
+<div id="feedback-overlay">
+  <div id="fb-icon">✓</div>
+  <div id="fb-text">¡CORRECTO!</div>
+  <div id="fb-sub"></div>
+</div>
+
+
+<!-- ════ PANTALLA FINAL ══════════════════════════════ -->
+<div class="screen off" id="sc-end">
+  <div style="font-size:13px;font-weight:700;
+              color:var(--txt2);letter-spacing:.15em;
+              text-transform:uppercase;margin-bottom:4px">
+    JUEGO TERMINADO
+  </div>
+
+  <div class="end-score" id="end-score">0</div>
+  <div class="end-rank" id="end-rank">RANGO C</div>
+
+  <div class="end-stats">
+    <div class="stat-card">
+      <div class="stat-val" id="end-correct">0</div>
+      <div class="stat-lbl">Correctas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="end-acc">0%</div>
+      <div class="stat-lbl">Accuracy</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="end-combo">×1</div>
+      <div class="stat-lbl">Max combo</div>
+    </div>
+  </div>
+
+  <!-- Matriz de confusión personal -->
+  <div id="confusion-wrap">
+    <div class="cm-title">
+      📊 Tu matriz de confusión personal
+    </div>
+    <div id="cm-content"></div>
+  </div>
+
+  <!-- Insight del modelo -->
+  <div class="insight-card" id="insight-card">
+    …
+  </div>
+
+  <button class="btn-replay" onclick="resetGame()">
+    ↩ Jugar de nuevo
+  </button>
+</div>
+
+
+<!-- ════ JAVASCRIPT ══════════════════════════════════ -->
+<script>
+/* ── DATOS ─────────────────────────────────────── */
+const EMO = {
+  alegria: {emoji:"😊",color:"var(--joy)",
+             label:"Alegría"},
+  tristeza:{emoji:"😢",color:"var(--sad)",
+             label:"Tristeza"},
+  enojo:   {emoji:"😡",color:"var(--ang)",
+             label:"Enojo"},
+  miedo:   {emoji:"😨",color:"var(--fea)",
+             label:"Miedo"},
+  sorpresa:{emoji:"😲",color:"var(--sur)",
+             label:"Sorpresa"},
+  asco:    {emoji:"🤢",color:"var(--dis)",
+             label:"Asco"},
+};
+
+const DIFF_META = {
+  1:{name:"Recluta",  cls:"diff-1",
+     badge:"🟢 Recluta",  time:4200},
+  2:{name:"Agente",   cls:"diff-2",
+     badge:"🟡 Agente",   time:3800},
+  3:{name:"Experto",  cls:"diff-3",
+     badge:"🔴 Experto",  time:3400},
+  4:{name:"Jefe",     cls:"diff-4",
+     badge:"🟣 Jefe",     time:3000},
+};
+
+const PHRASES = [
+  /* ── RECLUTA: emociones muy claras ── */
+  {t:"Hoy me siento muy feliz y lleno de energía",
+   e:"alegria",d:1},
+  {t:"Lloro sin poder parar y no sé por qué",
+   e:"tristeza",d:1},
+  {t:"Estoy furioso y no me puedo calmar para nada",
+   e:"enojo",d:1},
+  {t:"Tengo terror de lo que pueda pasar mañana",
+   e:"miedo",d:1},
+  {t:"¡Jamás imaginé que esto pudiera ocurrir!",
+   e:"sorpresa",d:1},
+  {t:"Eso me produce asco y repulsión total",
+   e:"asco",d:1},
+
+  /* ── AGENTE: vocabulario más variado ── */
+  {t:"Me siento en las nubes después de la noticia",
+   e:"alegria",d:2},
+  {t:"Siento un vacío enorme que no desaparece",
+   e:"tristeza",d:2},
+  {t:"Me hierve la sangre de tanta indignación",
+   e:"enojo",d:2},
+  {t:"La angustia no me deja pensar con claridad",
+   e:"miedo",d:2},
+  {t:"Quedé sin palabras con lo que me contaron",
+   e:"sorpresa",d:2},
+  {t:"Me revuelve el estómago verlo actuar así",
+   e:"asco",d:2},
+
+  /* ── EXPERTO: ambigüedad real ── */
+  {t:"No voy a poder soportar esta situación más",
+   e:"tristeza",d:3,
+   hint:"El modelo también la confunde con MIEDO — 'soportar' activa las dos clases"},
+  {t:"Por fin terminó todo esto",
+   e:"alegria",d:3,
+   hint:"El modelo la confunde con TRISTEZA — los finales tienen carga emocional doble"},
+  {t:"Se me eriza la piel solo de pensarlo",
+   e:"miedo",d:3,
+   hint:"Comparte vocabulario con SORPRESA — la piel de gallina aparece en las dos"},
+  {t:"No entiendo cómo alguien puede actuar así",
+   e:"asco",d:3,
+   hint:"El modelo la confunde con ENOJO — ambas reaccionan a injusticias con vocabulario similar"},
+  {t:"Ojalá pudiera desaparecer por un tiempo",
+   e:"tristeza",d:3},
+  {t:"Nunca pensé que llegaríamos a este punto",
+   e:"sorpresa",d:3,
+   hint:"Fácil confundir con TRISTEZA — el contexto negativo pesa más que la sorpresa"},
+
+  /* ── JEFE: las que fallan los modelos ── */
+  {t:"Me late el corazón muy rápido cuando pienso en eso",
+   e:"miedo",d:4,
+   hint:"El modelo confunde MIEDO y SORPRESA — ambas aceleran el corazón"},
+  {t:"Tengo una energía enorme y no entiendo por qué",
+   e:"alegria",d:4,
+   hint:"El modelo la confunde con SORPRESA — la energía inexplicable activa las dos clases"},
+  {t:"Ese comentario me atravesó como un cuchillo",
+   e:"tristeza",d:4,
+   hint:"El modelo la confunde con ENOJO — las metáforas físicas activan ambas"},
+  {t:"De repente todo tiene sentido y es perfecto",
+   e:"sorpresa",d:4,
+   hint:"Fácil confundir con ALEGRÍA — la claridad súbita tiene componentes de las dos"},
+  {t:"No puedo ni estar en el mismo espacio que eso",
+   e:"asco",d:4,
+   hint:"El modelo la confunde con MIEDO — el rechazo extremo comparte vocabulario con el temor"},
+  {t:"No sé si reír o llorar, en serio",
+   e:"sorpresa",d:4,
+   hint:"La emoción mixta confunde a humanos y al modelo por igual — es el límite del lenguaje"},
+];
+
+/* ── ESTADO ────────────────────────────────────── */
+let lives=3, score=0, combo=1, maxCombo=1;
+let correct=0, total=0;
+let timerInt=null, timeLeft=0, phraseDur=4000;
+let answered=false, gameOver=false;
+let queue=[];
+let idx=0;
+let currentPhrase=null;
+let curLevel=0;
+/* matriz[real][pred] */
+let matrix={};
+Object.keys(EMO).forEach(a=>{
+  matrix[a]={};
+  Object.keys(EMO).forEach(b=>matrix[a][b]=0);
+});
+
+/* ── AUDIO (Web Audio API sin archivos) ────────── */
+function beep(type){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=type==='ok'?880:220;
+    o.type='sine';
+    g.gain.setValueAtTime(.08,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(
+      .001,ctx.currentTime+.18
+    );
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime+.2);
+  }catch(e){}
+}
+function beepCombo(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,.08,.16].forEach((t,i)=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=660+i*110;
+      o.type='triangle';
+      g.gain.setValueAtTime(.06,ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+t+.12);
+      o.start(ctx.currentTime+t);
+      o.stop(ctx.currentTime+t+.15);
+    });
+  }catch(e){}
+}
+
+/* ── PANTALLAS ─────────────────────────────────── */
+function show(id){
+  document.querySelectorAll('.screen')
+          .forEach(s=>s.classList.add('off'));
+  document.getElementById(id)
+          .classList.remove('off');
+}
+
+/* ── INIT ──────────────────────────────────────── */
+function initGame(){
+  /* Ordenar por dificultad con shuffle dentro de cada nivel */
+  const byDiff=[1,2,3,4].map(d=>{
+    const group=PHRASES.filter(p=>p.d===d);
+    return group.sort(()=>Math.random()-.5);
+  });
+  queue=byDiff.flat();
+  lives=3; score=0; combo=1; maxCombo=1;
+  correct=0; total=0; idx=0; curLevel=0;
+  gameOver=false;
+  Object.keys(EMO).forEach(a=>
+    Object.keys(EMO).forEach(b=>matrix[a][b]=0)
+  );
+  updateHUD();
+  show('sc-game');
+  nextPhrase();
+}
+
+/* ── SIGUIENTE FRASE ───────────────────────────── */
+function nextPhrase(){
+  if(idx>=queue.length){endGame();return}
+
+  const p=queue[idx];
+  currentPhrase=p;
+  answered=false;
+
+  /* Transición de nivel */
+  const newLevel=p.d;
+  if(newLevel!==curLevel && curLevel>0){
+    showLevelTransition(newLevel,()=>loadPhrase(p));
+  } else {
+    curLevel=newLevel;
+    loadPhrase(p);
+  }
+}
+
+function showLevelTransition(lv,cb){
+  curLevel=lv;
+  const meta=DIFF_META[lv];
+  clearInterval(timerInt);
+  document.getElementById('lvl-num').textContent=lv;
+  document.getElementById('lvl-name').textContent=meta.name;
+  const descs={
+    2:"Las frases tienen vocabulario más variado.",
+    3:"⚠️ Zona de ambigüedad — igual que en la matriz de confusión del modelo.",
+    4:"☠️ Frases que literalmente confunden al Random Forest.",
+  };
+  document.getElementById('lvl-desc').textContent=
+    descs[lv]||"";
+  show('sc-level');
+  setTimeout(()=>{show('sc-game');cb();},2000);
+}
+
+function loadPhrase(p){
+  const box=document.getElementById('phrase-box');
+  box.className='';
+  box.textContent=p.t;
+  void box.offsetWidth;
+  box.classList.add('anim-in');
+
+  /* Dificultad badge */
+  const db=document.getElementById('diff-badge');
+  const meta=DIFF_META[p.d];
+  db.className='diff-badge '+meta.cls;
+  db.textContent=meta.badge;
+
+  /* Habilitar botones */
+  setButtons(true);
+
+  /* Timer */
+  phraseDur=meta.time;
+  timeLeft=phraseDur;
+  document.getElementById('timer-fill').style.width='100%';
+  document.getElementById('timer-fill').style.background='var(--acc)';
+  clearInterval(timerInt);
+  timerInt=setInterval(tickTimer,80);
+}
+
+function tickTimer(){
+  if(answered)return;
+  timeLeft-=80;
+  const pct=Math.max(0,timeLeft/phraseDur*100);
+  const fill=document.getElementById('timer-fill');
+  fill.style.width=pct+'%';
+  if(pct<30) fill.style.background='var(--red)';
+  else if(pct<60) fill.style.background='var(--joy)';
+  else fill.style.background='var(--acc)';
+  if(timeLeft<=0){
+    clearInterval(timerInt);
+    if(!answered) onTimeout();
+  }
+}
+
+function onTimeout(){
+  answered=true;
+  setButtons(false);
+  loseLife();
+  matrix[currentPhrase.e][currentPhrase.e]-=0; // no change needed
+  /* Highlight correct button */
+  highlightAnswer(currentPhrase.e,null);
+  showFeedback(false,'⏱ TIEMPO',
+    `Era: ${EMO[currentPhrase.e].emoji} ${EMO[currentPhrase.e].label}`,
+    null
+  );
+  total++;
+  setTimeout(()=>{
+    hideFeedback();
+    idx++;
+    nextPhrase();
+  },1600);
+}
+
+/* ── PICK ──────────────────────────────────────── */
+function pick(chosen){
+  if(answered||gameOver)return;
+  answered=true;
+  clearInterval(timerInt);
+  setButtons(false);
+  total++;
+
+  const real=currentPhrase.e;
+  const ok=chosen===real;
+  matrix[real][chosen]++;
+
+  highlightAnswer(real, ok?null:chosen);
+
+  if(ok){
+    correct++;
+    combo++;
+    if(combo>maxCombo) maxCombo=combo;
+    const pts=100*Math.min(combo,5);
+    score+=pts;
+    beep('ok');
+    if(combo%5===0 && combo>1) beepCombo();
+    const comboTxt=combo>1?` +×${Math.min(combo,5)}`:"";
+    showFeedback(true,'✓ CORRECTO',
+      currentPhrase.hint||"",
+      pts,comboTxt
+    );
+    document.getElementById('phrase-box')
+            .classList.add('correct');
+  } else {
+    combo=1;
+    loseLife();
+    beep('err');
+    const hint=currentPhrase.hint||
+      `La respuesta era ${EMO[real].emoji} ${EMO[real].label}`;
+    showFeedback(false,'✗ INCORRECTO',hint,null);
+    document.getElementById('phrase-box')
+            .classList.add('wrong');
+  }
+
+  updateHUD();
+
+  const delay=ok?1400:1800;
+  setTimeout(()=>{
+    hideFeedback();
+    idx++;
+    if(lives<=0){endGame();return}
+    nextPhrase();
+  },delay);
+}
+
+/* ── HELPERS ───────────────────────────────────── */
+function loseLife(){
+  lives=Math.max(0,lives-1);
+  const hearts=['','❤️','❤️❤️','❤️❤️❤️'];
+  document.getElementById('lives').textContent=
+    hearts[lives]||(lives<=0?'💔':'❤️');
+}
+
+function setButtons(on){
+  document.querySelectorAll('.emo-btn')
+    .forEach(b=>b.disabled=!on);
+}
+
+function highlightAnswer(real,wrong){
+  document.querySelectorAll('.emo-btn')
+    .forEach(b=>{
+      const emo=b.onclick.toString().match(/'([^']+)'/)[1];
+      if(emo===real) b.classList.add('flash-ans');
+      else if(emo===wrong) b.classList.add('flash-err');
+    });
+  setTimeout(()=>{
+    document.querySelectorAll('.emo-btn')
+      .forEach(b=>{
+        b.classList.remove('flash-ans','flash-err');
+      });
+  },1600);
+}
+
+function showFeedback(ok,title,sub,pts,comboSuffix){
+  const ov=document.getElementById('feedback-overlay');
+  document.getElementById('fb-icon').textContent=
+    ok?'✓':'✗';
+  document.getElementById('fb-icon').style.color=
+    ok?'var(--green)':'var(--red)';
+  let txt=title;
+  if(pts) txt+=`  +${pts}pts${comboSuffix||''}`;
+  document.getElementById('fb-text').textContent=txt;
+  document.getElementById('fb-text').style.color=
+    ok?'var(--green)':'var(--red)';
+  document.getElementById('fb-sub').textContent=sub||'';
+  ov.classList.add('show');
+}
+function hideFeedback(){
+  document.getElementById('feedback-overlay')
+          .classList.remove('show');
+}
+
+function updateHUD(){
+  document.getElementById('hud-score')
+          .textContent=score.toLocaleString();
+  const c=Math.min(combo,5);
+  const el=document.getElementById('combo');
+  el.textContent=`×${c}`;
+  el.style.color=c>=5?'var(--joy)':
+                 c>=3?'var(--sur)':'var(--txt2)';
+  document.getElementById('hud-level')
+          .textContent=DIFF_META[curLevel||1].name;
+}
+
+/* ── FIN DE JUEGO ──────────────────────────────── */
+function endGame(){
+  gameOver=true;
+  clearInterval(timerInt);
+
+  const acc=total>0?Math.round(correct/total*100):0;
+  const rank=score>=2000?'S':
+             score>=1200?'A':
+             score>=600 ?'B':'C';
+  const rankClass={S:'rank-s',A:'rank-a',
+                   B:'rank-b',C:'rank-c'};
+
+  document.getElementById('end-score')
+          .textContent=score.toLocaleString();
+  document.getElementById('end-rank').textContent=
+    `RANGO  ${rank}`;
+  document.getElementById('end-rank').className=
+    `end-rank ${rankClass[rank]}`;
+  document.getElementById('end-correct')
+          .textContent=`${correct}/${total}`;
+  document.getElementById('end-acc')
+          .textContent=acc+'%';
+  document.getElementById('end-combo')
+          .textContent='×'+Math.min(maxCombo,5);
+
+  buildConfusionMatrix();
+  buildInsight(acc,rank);
+  show('sc-end');
+}
+
+function buildConfusionMatrix(){
+  const errors=[];
+  Object.keys(EMO).forEach(real=>{
+    Object.keys(EMO).forEach(pred=>{
+      if(real!==pred && matrix[real][pred]>0){
+        errors.push({real,pred,n:matrix[real][pred]});
+      }
+    });
+  });
+  errors.sort((a,b)=>b.n-a.n);
+
+  const el=document.getElementById('cm-content');
+  if(errors.length===0){
+    el.innerHTML=`<div class="cm-empty">
+      🎯 ¡Sin errores! Accuracy perfecta.
+    </div>`;
+    return;
+  }
+  el.innerHTML=errors.map(e=>`
+    <div class="cm-row">
+      <div class="cm-real">
+        ${EMO[e.real].emoji} ${EMO[e.real].label}
+      </div>
+      <div class="cm-arrow">→ confundida con →</div>
+      <div class="cm-pred" style="color:${EMO[e.pred].color}">
+        ${EMO[e.pred].emoji} ${EMO[e.pred].label}
+      </div>
+      <div class="cm-count">${e.n}×</div>
+    </div>
+  `).join('');
+}
+
+function buildInsight(acc,rank){
+  const topError=getTopError();
+  const base=rank==='S'||rank==='A'
+    ? `¡Tu accuracy del ${acc}% supera la configuración base del modelo (C1)! Las confusiones que cometiste son exactamente las que aparecen en la diagonal fuera del centro de la matriz 6×6 del módulo 1.`
+    : `Tu accuracy del ${acc}% es similar a la de los modelos sin optimizar. Las frases que te confundieron son las mismas que hacen bajar el F1 del módulo 2.`;
+
+  const pairInsight=topError
+    ? ` La confusión ${EMO[topError.real].emoji}→${EMO[topError.pred].emoji} existe porque estas emociones comparten vocabulario en español — eso es exactamente lo que un vocabulario TF-IDF más amplio o un max_depth menor intentan corregir.`
+    :'';
+
+  document.getElementById('insight-card').innerHTML=
+    `<strong>¿Lo interesante?</strong> ${base}${pairInsight}`;
+}
+
+function getTopError(){
+  let top=null,max=0;
+  Object.keys(EMO).forEach(real=>{
+    Object.keys(EMO).forEach(pred=>{
+      if(real!==pred && matrix[real][pred]>max){
+        max=matrix[real][pred];
+        top={real,pred,n:max};
+      }
+    });
+  });
+  return top;
+}
+
+/* ── RESET ─────────────────────────────────────── */
+function resetGame(){
+  show('sc-start');
+}
+</script>
+</body>
+</html>
