@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+<title>EmoSense · Entrega Final</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ═══ PASOS ════════════════════════════════════ */
+.step { display: none; }
+.step.active { display: block; }
+
+/* ═══ PROGRESO ═════════════════════════════════ */
+.steps-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+.sn-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  background: var(--bg2);
+  display: flex; align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 700;
+  color: var(--text2);
+  transition: all .3s;
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.sn-dot.done {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.sn-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(124,106,247,.5);
+}
+.sn-line {
+  height: 2px; width: 40px;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background .3s;
+}
+.sn-line.done { background: var(--green); }
+
+/* ═══ PORTADA ══════════════════════════════════ */
+#step-cover {
+  text-align: center;
+  padding: 60px 20px;
+}
+.cover-logo {
+  font-size: clamp(48px,8vw,80px);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(
+    135deg, var(--accent), #f59e0b
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.cover-sub {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 24px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+.cover-pills {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.cpill {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+/* ═══ EVIDENCIA CARDS ══════════════════════════ */
+.ev-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+.ev-card {
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  user-select: none;
+}
+.ev-card:hover {
+  border-color: var(--border2);
+  background: var(--bg3);
+}
+.ev-card.checked {
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.ev-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all .15s;
+  margin-top: 1px;
+}
+.ev-card.checked .ev-check {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.ev-label {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.ev-sub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 3px;
+  font-family: var(--font-mono);
+}
+
+/* ═══ CAMPOS DE DATOS ══════════════════════════ */
+.data-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+.data-field { display: flex; flex-direction: column; gap: 6px; }
+.data-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.data-input {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.data-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.data-input::placeholder {
+  color: var(--text2);
+  opacity: .4;
+  font-style: italic;
+}
+
+/* ═══ FRASES NUEVAS ════════════════════════════ */
+.phrase-area {
+  background: var(--bg3);
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 12px 0;
+  transition: border-color .2s;
+}
+.phrase-area:focus-within {
+  border-color: var(--accent);
+  border-style: solid;
+}
+.phrase-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.phrase-count-num {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  transition: color .3s;
+}
+.pc-label {
+  font-size: 11px;
+  color: var(--text2);
+  font-family: var(--font-mono);
+}
+.phrase-ta {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  resize: none;
+  min-height: 130px;
+  line-height: 1.8;
+}
+.phrase-ta::placeholder {
+  color: var(--border2);
+  font-size: 12px;
+  font-style: italic;
+}
+.no-paste-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(251,191,36,.12);
+  border: 1px solid rgba(251,191,36,.3);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #fbbf24;
+  margin-bottom: 8px;
+}
+.paste-warn {
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #f87171;
+  font-family: var(--font-mono);
+  display: none;
+  margin-top: 6px;
+}
+.paste-warn.show { display: block; }
+
+/* ═══ EMOCIÓN SELECT ════════════════════════════ */
+.emo-select {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.emo-btn {
+  border: 1.5px solid;
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  background: transparent;
+}
+.emo-btn:hover { filter: brightness(1.2); }
+.emo-btn.sel { color: #fff !important; }
+
+/* ═══ PREGUNTAS (SIMPLE) ═══════════════════════ */
+.q-simple {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.q-simple .q-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.q-simple .q-text {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.opts-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--text2);
+  transition: all .12s;
+  text-align: left;
+  width: 100%;
+}
+.opt-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--text);
+}
+.opt-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 600;
+}
+.opt-btn.right {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+.opt-btn.wrong {
+  border-color: #f87171;
+  background: rgba(239,68,68,.08);
+  color: #f87171;
+}
+.opt-letter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 20px;
+  flex-shrink: 0;
+}
+
+/* ═══ NAVEGACIÓN ════════════════════════════════ */
+.nav-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* ═══ PANTALLA FINAL ════════════════════════════ */
+#step-final {
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  font-size: 24px;
+  animation: floatUp var(--dur, 4s)
+             var(--delay, 0s) ease-in forwards;
+}
+@keyframes floatUp {
+  0%   { transform: translateY(110vh) rotate(0deg); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(-80px) rotate(540deg); opacity: 0; }
+}
+.final-content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  width: 100%;
+}
+.final-name {
+  font-family: var(--font-mono);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  background: linear-gradient(
+    135deg, #a99af8, #f59e0b
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.final-title {
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--font-mono);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.score-circle {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 0 40px rgba(124,106,247,.35),
+              inset 0 0 30px rgba(124,106,247,.1);
+  background: var(--bg2);
+}
+.score-num {
+  font-family: var(--font-mono);
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+}
+.score-lbl {
+  font-size: 11px;
+  color: var(--text2);
+  font-family: var(--font-mono);
+  letter-spacing: .1em;
+}
+.final-rank {
+  display: inline-block;
+  padding: 5px 20px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .15em;
+  margin-bottom: 20px;
+}
+.rank-s { background:rgba(245,158,11,.15); color:#f59e0b; border: 1.5px solid #f59e0b; }
+.rank-a { background:rgba(52,211,170,.12); color:#34d399; border: 1.5px solid #34d399; }
+.rank-b { background:rgba(124,106,247,.12); color:#a99af8; border: 1.5px solid var(--accent); }
+.rank-c { background:rgba(122,120,150,.1); color:var(--text2); border: 1.5px solid var(--border2); }
+
+.quote-card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 18px 22px;
+  text-align: left;
+  margin: 4px 0;
+}
+.quote-text {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+.quote-author {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .1em;
+}
+.farewell-box {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.75;
+  text-align: center;
+}
+.farewell-box strong { color: var(--text); }
+.farewell-sig {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: .1em;
+  margin-top: 20px;
+}
+.breakdown-mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+.bm-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+}
+.bm-val {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.bm-lbl {
+  font-size: 10px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+/* ═══ MISC ══════════════════════════════════════ */
+.tag-m {
+  display: inline-block;
+  border-radius: 99px;
+  padding: 2px 9px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+.m3c { background:rgba(34,211,238,.12); color:#22d3ee; }
+.m4c { background:rgba(251,191,36,.12); color:#fbbf24; }
+
+@media(max-width:580px) {
+  .ev-grid, .data-row,
+  .breakdown-mini { grid-template-columns: 1fr; }
+  .emo-select { gap: 4px; }
+  .emo-btn { font-size: 11px; padding: 4px 10px; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="tb-left">
+    <span class="tb-materia">EmoSense</span>
+    <span class="tb-semestre">
+      Entrega Final · Etapas 3 y 4
+    </span>
+  </div>
+  <div class="tb-right">
+    <span id="paste-badge"
+          style="display:none;
+                 font-family:var(--font-mono);
+                 font-size:11px;color:#f87171">
+      ⚠ pegados: <span id="paste-count">0</span>
+    </span>
+    <button id="theme-toggle"
+            onclick="toggleTheme()">🌙</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ░░ PORTADA ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <div class="step active" id="step-cover">
+    <div style="text-align:center;padding:40px 0 20px">
+      <div class="cover-logo">🧠 EmoSense</div>
+      <div class="cover-sub">
+        Entrega Final · Etapas 3 y 4
+      </div>
+      <div class="cover-pills">
+        <span class="cpill">
+          💬 Chat con tkinter
+        </span>
+        <span class="cpill">
+          📊 App completa + historial
+        </span>
+        <span class="cpill">
+          ✍️ Nuevas frases al dataset
+        </span>
+        <span class="cpill">
+          📄 Reporte de sesión
+        </span>
+      </div>
+
+      <div class="context-box"
+           style="text-align:left;max-width:560px;
+                  margin:0 auto 28px">
+        <div class="ctx-title">
+          ¿Qué vas a demostrar hoy?
+        </div>
+        <p>
+          Que tu proyecto <strong>funciona</strong>.
+          Que el chat detecta emociones.
+          Que la app completa registra la sesión.
+          Y que mejoraste el modelo agregando
+          más frases a tu propio dataset.
+        </p>
+        <p style="margin-top:8px;font-size:13px;
+                   color:var(--text2)">
+          No necesitas memorizar — necesitas
+          haber <em>corrido el código</em>
+          y tener tus resultados a la mano.
+        </p>
+      </div>
+
+      <button class="btn btn-primary"
+              style="font-size:16px;
+                     padding:14px 44px"
+              onclick="goStep(1)">
+        Comenzar →
+      </button>
+    </div>
+  </div><!-- /portada -->
+
+
+  <!-- ░░ PASO 1 — IDENTIFICACIÓN ░░░░░░░░░░░░░░ -->
+  <div class="step" id="step-1">
+    <div class="steps-nav" id="nav1"></div>
+    <div class="eval-header"
+         style="padding-bottom:16px">
+      <div class="eval-tag">Paso 1 de 4</div>
+      <h1 style="font-size:clamp(22px,4vw,36px)">
+        ¿Quién eres?
+      </h1>
+      <div class="eval-sub">
+        Tus datos aparecerán en la pantalla final
+      </div>
+    </div>
+
+    <div class="student-card">
+      <div class="sc-title">Tus datos</div>
+      <div class="sc-grid">
+        <div class="sc-field">
+          <label>Nombre completo</label>
+          <input type="text" id="inp-nombre"
+                 placeholder="Tu nombre completo">
+        </div>
+        <div class="sc-field">
+          <label>Grupo</label>
+          <input type="text" id="inp-grupo"
+                 placeholder="Ej: LSC-2B">
+        </div>
+        <div class="sc-field">
+          <label>Fecha</label>
+          <input type="text" id="inp-fecha"
+                 placeholder="DD/MM/AAAA">
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary"
+              onclick="validarPaso1()">
+        Siguiente →
+      </button>
+    </div>
+  </div><!-- /paso1 -->
+
+
+  <!-- ░░ PASO 2 — EVIDENCIA ETAPA 3 ░░░░░░░░░░░ -->
+  <div class="step" id="step-2">
+    <div class="steps-nav" id="nav2"></div>
+
+    <div class="eval-header"
+         style="padding-bottom:16px">
+      <div class="eval-tag">
+        Paso 2 de 4
+        <span class="tag-m m3c"
+              style="margin-left:8px">
+          Etapa 3
+        </span>
+      </div>
+      <h1 style="font-size:clamp(22px,4vw,36px)">
+        Tu chat de emociones
+      </h1>
+      <div class="eval-sub">
+        03_chat_tkinter.py en acción
+      </div>
+    </div>
+
+    <!-- Checklist de funcionamiento -->
+    <div class="section-title">
+      ✔ Marca lo que funciona en tu chat
+    </div>
+    <div class="ev-grid" id="ev3-grid">
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            La ventana del chat abre sin errores
+          </div>
+          <div class="ev-sub">
+            F5 en IDLE → ventana tkinter visible
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            El modelo detecta la emoción
+          </div>
+          <div class="ev-sub">
+            Aparece el emoji y el porcentaje
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            Se muestran las 6 barras de probabilidad
+          </div>
+          <div class="ev-sub">
+            Panel lateral derecho con barras de color
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            EmoSense responde empáticamente
+          </div>
+          <div class="ev-sub">
+            Aparece texto de respuesta + pregunta
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            El botón "Nueva sesión" funciona
+          </div>
+          <div class="ev-sub">
+            Limpia el chat y reinicia
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            Cada mensaje muestra timestamp
+          </div>
+          <div class="ev-sub">
+            Formato [HH:MM] visible en el chat
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos reales de la sesión -->
+    <div class="section-title"
+         style="margin-top:20px">
+      📝 Datos de tu sesión de prueba en M3
+    </div>
+    <div class="data-row">
+      <div class="data-field">
+        <label class="data-label">
+          Primer mensaje que enviaste
+        </label>
+        <input class="data-input" type="text"
+               id="d3-msg1"
+               placeholder="Escribe exactamente lo que pusiste">
+      </div>
+      <div class="data-field">
+        <label class="data-label">
+          Emoción que detectó el modelo
+        </label>
+        <input class="data-input" type="text"
+               id="d3-emo"
+               placeholder="Ej: alegria, tristeza...">
+      </div>
+      <div class="data-field">
+        <label class="data-label">
+          Confianza (%) de esa predicción
+        </label>
+        <input class="data-input" type="text"
+               id="d3-conf"
+               placeholder="Ej: 87.3%">
+      </div>
+      <div class="data-field">
+        <label class="data-label">
+          ¿El modelo se equivocó en algún mensaje?
+        </label>
+        <input class="data-input" type="text"
+               id="d3-err"
+               placeholder="Sí/No — si sí, ¿cuál?">
+      </div>
+    </div>
+
+    <!-- Reflexión libre M3 -->
+    <div class="section-title">
+      💬 En tus palabras
+    </div>
+    <div class="field-wrap" id="ref3-wrap">
+      <label class="field-label">
+        ¿Qué fue lo más sorprendente de ver
+        tu modelo funcionando en el chat?
+        (mínimo 2 líneas)
+      </label>
+      <textarea
+        id="ref3"
+        class="code-block"
+        style="width:100%;min-height:80px;
+               resize:vertical;background:var(--bg2);
+               border:1px dashed var(--border2);
+               border-radius:var(--radius-sm);
+               color:var(--text);font-family:var(--font-body);
+               font-size:13.5px;line-height:1.7;
+               padding:12px 14px;outline:none"
+        placeholder="Lo que más me sorprendió fue..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary"
+              onclick="validarPaso2()">
+        Siguiente →
+      </button>
+    </div>
+  </div><!-- /paso2 -->
+
+
+  <!-- ░░ PASO 3 — EVIDENCIA ETAPA 4 ░░░░░░░░░░░ -->
+  <div class="step" id="step-3">
+    <div class="steps-nav" id="nav3"></div>
+
+    <div class="eval-header"
+         style="padding-bottom:16px">
+      <div class="eval-tag">
+        Paso 3 de 4
+        <span class="tag-m m4c"
+              style="margin-left:8px">
+          Etapa 4
+        </span>
+      </div>
+      <h1 style="font-size:clamp(22px,4vw,36px)">
+        Tu app completa + nuevas frases
+      </h1>
+      <div class="eval-sub">
+        04_emosense_app.py · Historial · Mejora del modelo
+      </div>
+    </div>
+
+    <!-- Checklist M4 -->
+    <div class="section-title">
+      ✔ Marca lo que funciona en tu app completa
+    </div>
+    <div class="ev-grid" id="ev4-grid">
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            El historial de sesión se actualiza
+          </div>
+          <div class="ev-sub">
+            Mini-barras del sidebar crecen por mensaje
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            Muestra la emoción dominante
+          </div>
+          <div class="ev-sub">
+            Etiqueta coloreada debajo del historial
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            El botón "Cerrar sesión" funciona
+          </div>
+          <div class="ev-sub">
+            Abre diálogo de confirmación
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            Se generó el reporte .txt
+          </div>
+          <div class="ev-sub">
+            reportes/sesion_YYYYMMDD_*.txt
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            Se generó la gráfica .png
+          </div>
+          <div class="ev-sub">
+            graficas/sesion_*.png con barras de color
+          </div>
+        </div>
+      </div>
+      <div class="ev-card"
+           onclick="toggleEv(this)">
+        <div class="ev-check">✓</div>
+        <div>
+          <div class="ev-label">
+            Cargó modelo_optimo.pkl del Módulo 2
+          </div>
+          <div class="ev-sub">
+            Shell muestra "Módulo 2 (óptimo)"
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos de sesión M4 -->
+    <div class="section-title"
+         style="margin-top:20px">
+      📊 Datos de tu sesión en M4
+    </div>
+    <div class="data-row">
+      <div class="data-field">
+        <label class="data-label">
+          Total de mensajes enviados
+        </label>
+        <input class="data-input" type="text"
+               id="d4-total"
+               placeholder="Ej: 12">
+      </div>
+      <div class="data-field">
+        <label class="data-label">
+          Emoción dominante de la sesión
+        </label>
+        <input class="data-input" type="text"
+               id="d4-dom"
+               placeholder="Ej: tristeza">
+      </div>
+      <div class="data-field">
+        <label class="data-label">
+          Nombre del archivo .txt generado
+        </label>
+        <input class="data-input" type="text"
+               id="d4-txt"
+               placeholder="sesion_20240115_...txt">
+      </div>
+      <div class="data-field">
+        <label class="data-label">
+          Emoción que más mejoró con nuevas frases
+        </label>
+        <input class="data-input" type="text"
+               id="d4-mejor"
+               placeholder="Ej: sorpresa o asco">
+      </div>
+    </div>
+
+    <!-- Nuevas frases (clave de la mejora) -->
+    <div class="section-title"
+         style="margin-top:24px">
+      ✍️ Tus nuevas frases para el dataset
+    </div>
+
+    <div class="context-box"
+         style="margin-bottom:14px">
+      <div class="ctx-title">
+        ¿Por qué agregar más frases?
+      </div>
+      <p>
+        El modelo confunde emociones porque comparten
+        vocabulario. Al agregar frases con palabras
+        <strong>exclusivas</strong> de una emoción,
+        le das más señales para distinguirla.
+        Escribe al menos <strong>5 frases nuevas</strong>
+        para la emoción que más te costó.
+      </p>
+    </div>
+
+    <div class="phrase-area" id="phrase-area">
+      <div class="phrase-counter">
+        <div>
+          <div style="font-family:var(--font-mono);
+                      font-size:10px;color:var(--text2);
+                      letter-spacing:.1em;
+                      text-transform:uppercase;
+                      margin-bottom:3px">
+            Frases escritas
+          </div>
+          <div style="display:flex;
+                      align-items:baseline;gap:4px">
+            <span class="phrase-count-num"
+                  id="phrase-num">0</span>
+            <span class="pc-label">/ mínimo 5</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);
+                      font-size:10px;color:var(--text2);
+                      letter-spacing:.1em;
+                      text-transform:uppercase;
+                      margin-bottom:6px">
+            Emoción que refuerzas
+          </div>
+          <div class="emo-select" id="emo-sel">
+            <button class="emo-btn"
+                    data-emo="alegria"
+                    style="border-color:#d97706;
+                           color:#d97706"
+                    onclick="selEmo(this)">
+              😊 Alegría
+            </button>
+            <button class="emo-btn"
+                    data-emo="tristeza"
+                    style="border-color:#3b82f6;
+                           color:#3b82f6"
+                    onclick="selEmo(this)">
+              😢 Tristeza
+            </button>
+            <button class="emo-btn"
+                    data-emo="enojo"
+                    style="border-color:#ef4444;
+                           color:#ef4444"
+                    onclick="selEmo(this)">
+              😡 Enojo
+            </button>
+            <button class="emo-btn"
+                    data-emo="miedo"
+                    style="border-color:#8b5cf6;
+                           color:#8b5cf6"
+                    onclick="selEmo(this)">
+              😨 Miedo
+            </button>
+            <button class="emo-btn"
+                    data-emo="sorpresa"
+                    style="border-color:#14b8a6;
+                           color:#14b8a6"
+                    onclick="selEmo(this)">
+              😲 Sorpresa
+            </button>
+            <button class="emo-btn"
+                    data-emo="asco"
+                    style="border-color:#84cc16;
+                           color:#84cc16"
+                    onclick="selEmo(this)">
+              🤢 Asco
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-paste-badge">
+        ⚡ Escribe las frases — no uses Ctrl+V aquí
+      </div>
+
+      <textarea
+        id="phrases-ta"
+        class="phrase-ta"
+        placeholder="Una frase por línea. Escríbelas tú mismo.
+
+Ej:
+Llevo días sin poder levantarme de la cama
+La nostalgia me consume cuando escucho esa canción
+Siento que el tiempo pasa y yo me quedé atrás
+..."></textarea>
+
+      <div class="paste-warn" id="paste-warn">
+        ⚠️ Pegado detectado — las frases deben ser escritas por ti.
+        Puntaje reducido.
+      </div>
+    </div>
+
+    <!-- Reflexión mejora -->
+    <div class="field-wrap" style="margin-top:16px">
+      <label class="field-label">
+        ¿Cómo describirías con tus palabras lo que
+        hace cada módulo? (una frase por módulo)
+      </label>
+      <textarea
+        id="ref4"
+        style="width:100%;min-height:100px;
+               resize:vertical;background:var(--bg2);
+               border:1px dashed var(--border2);
+               border-radius:var(--radius-sm);
+               color:var(--text);font-family:var(--font-body);
+               font-size:13.5px;line-height:1.8;
+               padding:12px 14px;outline:none"
+        placeholder="M1: _____________
+M2: _____________
+M3: _____________
+M4: _____________"></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary"
+              onclick="validarPaso3()">
+        Siguiente →
+      </button>
+    </div>
+  </div><!-- /paso3 -->
+
+
+  <!-- ░░ PASO 4 — 5 PREGUNTAS RÁPIDAS ░░░░░░░░░ -->
+  <div class="step" id="step-4">
+    <div class="steps-nav" id="nav4"></div>
+
+    <div class="eval-header"
+         style="padding-bottom:16px">
+      <div class="eval-tag">Paso 4 de 4</div>
+      <h1 style="font-size:clamp(22px,4vw,36px)">
+        5 preguntas rápidas
+      </h1>
+      <div class="eval-sub">
+        Basadas en lo que corriste en IDLE
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-simple" id="qs1">
+      <div class="q-num">01 · Etapa 3</div>
+      <div class="q-text">
+        ¿Cómo carga el chat de la Etapa 3
+        el modelo entrenado en el Módulo 2?
+      </div>
+      <div class="opts-wrap">
+        <button class="opt-btn"
+                onclick="pickQ(1,'a')"
+                id="q1a">
+          <span class="opt-letter">A</span>
+          Vuelve a entrenar el modelo cada vez
+          que se abre el chat.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(1,'b')"
+                id="q1b">
+          <span class="opt-letter">B</span>
+          Usa
+          <code style="font-family:var(--font-mono)">
+            joblib.load("modelos/modelo_optimo.pkl")
+          </code>
+          para cargarlo desde disco.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(1,'c')"
+                id="q1c">
+          <span class="opt-letter">C</span>
+          Descarga el modelo de internet
+          la primera vez que se ejecuta.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(1,'d')"
+                id="q1d">
+          <span class="opt-letter">D</span>
+          El modelo se escribe directamente
+          en el código del chat.
+        </button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-simple" id="qs2">
+      <div class="q-num">02 · Etapa 3</div>
+      <div class="q-text">
+        Las 6 barras de probabilidad del chat
+        muestran la confianza del modelo en
+        cada emoción. Si la barra de "tristeza"
+        es la más alta, ¿qué significa?
+      </div>
+      <div class="opts-wrap">
+        <button class="opt-btn"
+                onclick="pickQ(2,'a')"
+                id="q2a">
+          <span class="opt-letter">A</span>
+          Que el modelo clasificó el texto
+          como tristeza con la mayor probabilidad.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(2,'b')"
+                id="q2b">
+          <span class="opt-letter">B</span>
+          Que hay más frases de tristeza
+          en el dataset de entrenamiento.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(2,'c')"
+                id="q2c">
+          <span class="opt-letter">C</span>
+          Que el usuario está definitivamente
+          triste sin posibilidad de error.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(2,'d')"
+                id="q2d">
+          <span class="opt-letter">D</span>
+          Que la palabra "tristeza" apareció
+          en el mensaje escrito.
+        </button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-simple" id="qs3">
+      <div class="q-num">03 · Etapa 4</div>
+      <div class="q-text">
+        En la Etapa 4 al hacer clic en
+        "Cerrar sesión", se generan dos archivos.
+        ¿Para qué sirve la gráfica .png generada?
+      </div>
+      <div class="opts-wrap">
+        <button class="opt-btn"
+                onclick="pickQ(3,'a')"
+                id="q3a">
+          <span class="opt-letter">A</span>
+          Para reentrenar el modelo con
+          los datos de la sesión.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(3,'b')"
+                id="q3b">
+          <span class="opt-letter">B</span>
+          Para visualizar la distribución
+          emocional de la sesión completa
+          en una sola imagen.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(3,'c')"
+                id="q3c">
+          <span class="opt-letter">C</span>
+          Para reemplazar la matriz
+          de confusión del Módulo 1.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(3,'d')"
+                id="q3d">
+          <span class="opt-letter">D</span>
+          Para guardar una captura de pantalla
+          del chat tkinter.
+        </button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-simple" id="qs4">
+      <div class="q-num">04 · Mejora del modelo</div>
+      <div class="q-text">
+        Agregaste nuevas frases al dataset del
+        Módulo 1 para mejorar el modelo.
+        ¿Cuál estrategia hace que esas frases
+        realmente ayuden?
+      </div>
+      <div class="opts-wrap">
+        <button class="opt-btn"
+                onclick="pickQ(4,'a')"
+                id="q4a">
+          <span class="opt-letter">A</span>
+          Que sean frases muy cortas para
+          que el modelo las memorice más fácil.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(4,'b')"
+                id="q4b">
+          <span class="opt-letter">B</span>
+          Que usen vocabulario específico de
+          esa emoción, diferente al vocabulario
+          de las emociones con que se confunde.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(4,'c')"
+                id="q4c">
+          <span class="opt-letter">C</span>
+          Que sean copiadas de internet para
+          asegurar que el vocabulario sea correcto.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(4,'d')"
+                id="q4d">
+          <span class="opt-letter">D</span>
+          Que se agreguen por igual a todas
+          las emociones sin importar cuál
+          tiene el F1 más bajo.
+        </button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-simple" id="qs5">
+      <div class="q-num">05 · Proyecto completo</div>
+      <div class="q-text">
+        Si alguien te pregunta "¿para qué sirve
+        el EmoSense que construiste?",
+        ¿cuál es la respuesta más completa?
+      </div>
+      <div class="opts-wrap">
+        <button class="opt-btn"
+                onclick="pickQ(5,'a')"
+                id="q5a">
+          <span class="opt-letter">A</span>
+          Es un chat que traduce texto al inglés
+          y detecta el idioma del usuario.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(5,'b')"
+                id="q5b">
+          <span class="opt-letter">B</span>
+          Es una aplicación que usa Machine
+          Learning para detectar emociones en
+          texto, responde con empatía y genera
+          un análisis de la sesión emocional.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(5,'c')"
+                id="q5c">
+          <span class="opt-letter">C</span>
+          Es una calculadora de probabilidades
+          que mide qué tan positivo es un mensaje.
+        </button>
+        <button class="opt-btn"
+                onclick="pickQ(5,'d')"
+                id="q5d">
+          <span class="opt-letter">D</span>
+          Es un analizador de errores de Python
+          que detecta bugs emocionales en el código.
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary"
+              onclick="calcularYFinalizar()">
+        Ver mi resultado →
+      </button>
+    </div>
+  </div><!-- /paso4 -->
+
+
+  <!-- ░░ PANTALLA FINAL ░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <div class="step" id="step-final">
+    <div class="particles" id="particles"></div>
+    <div class="final-content">
+
+      <div class="final-name"
+           id="final-nombre">—</div>
+      <div class="final-title">
+        Técnico en IA · Módulo III
+      </div>
+
+      <div class="score-circle">
+        <div class="score-num"
+             id="final-score">0</div>
+        <div class="score-lbl">PUNTOS</div>
+      </div>
+
+      <div id="final-rank-wrap"></div>
+
+      <div class="breakdown-mini">
+        <div class="bm-item">
+          <div class="bm-val" id="b-ev">0</div>
+          <div class="bm-lbl">Evidencias</div>
+        </div>
+        <div class="bm-item">
+          <div class="bm-val" id="b-fr">0</div>
+          <div class="bm-lbl">Frases nuevas</div>
+        </div>
+        <div class="bm-item">
+          <div class="bm-val" id="b-q">0</div>
+          <div class="bm-lbl">Preguntas</div>
+        </div>
+        <div class="bm-item">
+          <div class="bm-val" id="b-ref">0</div>
+          <div class="bm-lbl">Reflexión</div>
+        </div>
+      </div>
+
+      <div class="quote-card" id="quote-card">
+        <div class="quote-text"
+             id="quote-text">…</div>
+        <div class="quote-author">
+          — EmoSense v2.0
+        </div>
+      </div>
+
+      <div class="farewell-box">
+        <div id="farewell-text">…</div>
+      </div>
+
+      <div class="farewell-sig">
+        EmoSense v2.0 · Módulo III · Técnico en IA ·
+        <span id="final-fecha">—</span>
+      </div>
+
+    </div>
+  </div><!-- /final -->
+
+</div><!-- /container -->
+
+<!-- ════════════════════════════════════════════ -->
+<script>
+/* ── CONSTANTES ─────────────────────────────── */
+const CORRECT_Q = { 1:'b', 2:'a', 3:'b',
+                    4:'b', 5:'b' };
+
+const QUOTES = {
+  s: {
+    text: "Lo que construiste no es un ejercicio "
+         +"escolar. Es el mismo tipo de sistema que "
+         +"usan empresas reales para analizar "
+         +"emociones. La diferencia es que tú sabes "
+         +"exactamente cómo funciona por dentro.",
+    rank: "RANGO  S", cls: "rank-s"
+  },
+  a: {
+    text: "Aprendiste a enseñarle a una máquina a "
+         +"reconocer emociones humanas. Eso no lo "
+         +"aprende todo el mundo. Con práctica y más "
+         +"datos, tu modelo puede ser mucho mejor.",
+    rank: "RANGO  A", cls: "rank-a"
+  },
+  b: {
+    text: "Tu proyecto funciona. Eso ya es más de "
+         +"lo que muchos logran. La IA no es magia "
+         +"— es entrenamiento, datos y paciencia. "
+         +"Tú ya tienes los tres.",
+    rank: "RANGO  B", cls: "rank-b"
+  },
+  c: {
+    text: "Cada línea de código que corriste te "
+         +"acercó a entender cómo funciona la IA "
+         +"desde adentro. Sigue practicando. "
+         +"El camino apenas empieza.",
+    rank: "RANGO  C", cls: "rank-c"
+  }
+};
+
+const FAREWELLS = [
+  "Gracias por darle vida a EmoSense. "
+ +"De todas las cosas que pudiste aprender "
+ +"en este módulo, elegiste entender cómo una "
+ +"máquina puede escuchar. Eso importa.",
+  "La Inteligencia Artificial no reemplaza "
+ +"la inteligencia humana — la amplifica. "
+ +"Y tú aprendiste a programar esa amplificación. "
+ +"Eso no se olvida.",
+  "EmoSense no existía antes de que "
+ +"lo construyeras. Ahora existe gracias a ti. "
+ +"Eso es exactamente lo que hace un desarrollador "
+ +"de IA: crear herramientas que antes no existían.",
+];
+
+/* ── ESTADO ──────────────────────────────────── */
+let currentStep = 0;
+let answers     = {};
+let pasteCount  = 0;
+let emoSel      = null;
+
+/* ── NAVEGACIÓN ──────────────────────────────── */
+function goStep(n) {
+  document.querySelectorAll('.step')
+    .forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(
+    n === 0 ? 'step-cover'
+    : n === 99 ? 'step-final'
+    : 'step-' + n
+  );
+  if (el) {
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  currentStep = n;
+  buildNav(n);
+}
+
+function buildNav(active) {
+  const ids = ['nav1','nav2','nav3','nav4'];
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const step = i + 1;
+    let html = '';
+    for (let s = 1; s <= 4; s++) {
+      const cls = s < active ? 'done'
+                : s === active ? 'active' : '';
+      html += `<div class="sn-dot ${cls}">${s}</div>`;
+      if (s < 4) {
+        const lineCls = s < active ? 'done' : '';
+        html += `<div class="sn-line ${lineCls}"></div>`;
+      }
+    }
+    el.innerHTML = html;
+  });
+}
+
+/* ── VALIDACIONES ────────────────────────────── */
+function validarPaso1() {
+  const n = document.getElementById(
+    'inp-nombre'
+  ).value.trim();
+  if (!n) {
+    alert('Por favor escribe tu nombre.');
+    return;
+  }
+  document.getElementById('inp-fecha')
+    .value = document.getElementById('inp-fecha')
+    .value ||
+    new Date().toLocaleDateString('es-MX');
+  goStep(2);
+}
+
+function validarPaso2() {
+  const ref = document.getElementById(
+    'ref3'
+  ).value.trim();
+  if (ref.length < 20) {
+    alert(
+      'Escribe al menos 2 líneas en la '
+      + 'reflexión antes de continuar.'
+    );
+    return;
+  }
+  goStep(3);
+}
+
+function validarPaso3() {
+  const n = countPhrases();
+  if (n < 5) {
+    alert(
+      'Escribe al menos 5 frases nuevas '
+      + '(tienes ' + n + ').'
+    );
+    return;
+  }
+  if (!emoSel) {
+    alert(
+      'Selecciona la emoción que estás '
+      + 'reforzando.'
+    );
+    return;
+  }
+  goStep(4);
+}
+
+/* ── EVIDENCIAS (CHECKLIST) ──────────────────── */
+function toggleEv(card) {
+  card.classList.toggle('checked');
+}
+
+/* ── EMOCIÓN SELECTOR ────────────────────────── */
+function selEmo(btn) {
+  document.querySelectorAll('.emo-btn')
+    .forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  btn.style.background = btn.style.color;
+  emoSel = btn.dataset.emo;
+}
+
+/* ── CONTADOR DE FRASES ──────────────────────── */
+function countPhrases() {
+  const ta = document.getElementById(
+    'phrases-ta'
+  );
+  if (!ta) return 0;
+  return ta.value
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 5)
+    .length;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('phrases-ta');
+  if (!ta) return;
+  ta.addEventListener('input', () => {
+    const n   = countPhrases();
+    const el  = document.getElementById(
+      'phrase-num'
+    );
+    el.textContent = n;
+    el.style.color = n >= 5
+      ? 'var(--green)'
+      : n >= 3
+        ? 'var(--warning)'
+        : 'var(--text2)';
+  });
+
+  /* Bloquear paste en el área de frases */
+  ta.addEventListener('paste', e => {
+    e.preventDefault();
+    pasteCount++;
+    document.getElementById('paste-warn')
+            .classList.add('show');
+    document.getElementById('paste-badge')
+            .style.display = 'inline';
+    document.getElementById('paste-count')
+            .textContent = pasteCount;
+  });
+});
+
+/* ── PREGUNTAS ───────────────────────────────── */
+function pickQ(q, opt) {
+  if (answers['q' + q]) return;
+  answers['q' + q] = opt;
+  const correct = CORRECT_Q[q];
+  ['a','b','c','d'].forEach(o => {
+    const btn = document.getElementById(
+      'q' + q + o
+    );
+    if (!btn) return;
+    btn.disabled = true;
+    if (o === correct) {
+      btn.classList.add('right');
+    } else if (o === opt && opt !== correct) {
+      btn.classList.add('wrong');
+    }
+  });
+}
+
+/* ── CALCULAR PUNTAJE ────────────────────────── */
+function calcularYFinalizar() {
+  /* 1. Evidencias checkeadas */
+  const ev3 = document.querySelectorAll(
+    '#ev3-grid .ev-card.checked'
+  ).length;
+  const ev4 = document.querySelectorAll(
+    '#ev4-grid .ev-card.checked'
+  ).length;
+  const evScore = Math.round(
+    ((ev3 + ev4) / 12) * 30
+  );
+
+  /* 2. Frases nuevas */
+  const nFrases = countPhrases();
+  const phraseScore =
+    nFrases >= 10 ? 20
+    : nFrases >= 8  ? 17
+    : nFrases >= 6  ? 14
+    : nFrases >= 5  ? 10
+    : Math.round(nFrases * 2);
+
+  /* 3. Preguntas */
+  let qScore = 0;
+  for (let i = 1; i <= 5; i++) {
+    if (answers['q' + i] === CORRECT_Q[i]) {
+      qScore += 8;
+    }
+  }
+
+  /* 4. Reflexiones (datos completados) */
+  const d3 = [
+    document.getElementById('d3-msg1'),
+    document.getElementById('d3-emo'),
+    document.getElementById('d3-conf'),
+  ].filter(e => e && e.value.trim().length > 2)
+   .length;
+  const d4 = [
+    document.getElementById('d4-total'),
+    document.getElementById('d4-dom'),
+    document.getElementById('d4-txt'),
+  ].filter(e => e && e.value.trim().length > 2)
+   .length;
+  const ref3 = document.getElementById('ref3')
+    .value.trim().length > 30 ? 1 : 0;
+  const ref4 = document.getElementById('ref4')
+    .value.trim().length > 30 ? 1 : 0;
+  const refScore = Math.round(
+    ((d3 / 3) + (d4 / 3) + ref3 + ref4) / 4 * 10
+  );
+
+  /* Penalización por paste */
+  const penalty = Math.min(pasteCount * 3, 15);
+
+  let total = Math.max(
+    0,
+    Math.min(
+      100,
+      evScore + phraseScore + qScore + refScore
+      - penalty
+    )
+  );
+
+  showFinal(total, evScore, phraseScore,
+            qScore, refScore);
+}
+
+/* ── PANTALLA FINAL ──────────────────────────── */
+function showFinal(
+  score, evS, frS, qS, refS
+) {
+  goStep(99);
+
+  const nombre = document.getElementById(
+    'inp-nombre'
+  ).value.trim();
+  const grupo  = document.getElementById(
+    'inp-grupo'
+  ).value.trim();
+
+  document.getElementById('final-nombre')
+    .textContent = nombre || 'Alumno';
+  document.getElementById('final-fecha')
+    .textContent = new Date().toLocaleDateString(
+      'es-MX'
+    );
+
+  /* Rango */
+  const q  = score >= 90 ? 's'
+           : score >= 75 ? 'a'
+           : score >= 60 ? 'b' : 'c';
+  const qd = QUOTES[q];
+
+  document.getElementById('quote-text')
+    .textContent = qd.text;
+  document.getElementById('final-rank-wrap')
+    .innerHTML =
+    `<span class="final-rank ${qd.cls}">
+       ${qd.rank}
+     </span>`;
+
+  document.getElementById('farewell-text')
+    .innerHTML =
+    FAREWELLS[Math.floor(Math.random() * 3)];
+
+  /* Breakdown */
+  document.getElementById('b-ev')
+    .textContent = evS;
+  document.getElementById('b-fr')
+    .textContent = frS;
+  document.getElementById('b-q')
+    .textContent = qS;
+  document.getElementById('b-ref')
+    .textContent = refS;
+
+  /* Contar animado */
+  animateScore(score);
+
+  /* Partículas */
+  launchParticles();
+}
+
+function animateScore(target) {
+  const el = document.getElementById(
+    'final-score'
+  );
+  let current  = 0;
+  const step   = Math.ceil(target / 40);
+  const circle = document.querySelector(
+    '.score-circle'
+  );
+  const color  = target >= 90 ? '#f59e0b'
+               : target >= 75 ? '#34d399'
+               : target >= 60 ? '#a99af8'
+               : '#7a7896';
+  if (circle) {
+    circle.style.borderColor = color;
+    circle.style.boxShadow   =
+      `0 0 40px ${color}55, `
+      + `inset 0 0 30px ${color}22`;
+  }
+  const interval = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current;
+    el.style.color = color;
+    if (current >= target) {
+      clearInterval(interval);
+    }
+  }, 35);
+}
+
+function launchParticles() {
+  const wrap = document.getElementById(
+    'particles'
+  );
+  const emojis =
+    ['😊','😢','😡','😨','😲','🤢',
+     '✨','⭐','🌟','💜','🎉'];
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent =
+      emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.setProperty(
+      '--dur', (3 + Math.random() * 3) + 's'
+    );
+    p.style.setProperty(
+      '--delay', (Math.random() * 2) + 's'
+    );
+    p.style.left =
+      (Math.random() * 100) + 'vw';
+    p.style.fontSize =
+      (16 + Math.random() * 20) + 'px';
+    wrap.appendChild(p);
+    setTimeout(() => p.remove(), 6000);
+  }
+}
+
+/* ── CHECKLIST EVIDENCIAS ────────────────────── */
+function toggleEv(card) {
+  card.classList.toggle('checked');
+}
+
+/* ── TEMA ────────────────────────────────────── */
+function toggleTheme() {
+  const d = document.documentElement;
+  const isDark = !d.hasAttribute('data-theme');
+  d.setAttribute('data-theme', isDark?'light':'');
+  document.getElementById('theme-toggle')
+    .textContent = isDark ? '🌙' : '☀️';
+}
+
+/* ── INIT ────────────────────────────────────── */
+window.addEventListener('load', () => {
+  const f = document.getElementById('inp-fecha');
+  if (f) {
+    f.value = new Date().toLocaleDateString('es-MX');
+  }
+  buildNav(1);
+});
+</script>
+</body>
+</html>
