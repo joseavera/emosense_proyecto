@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+<title>EmoSense · Evaluación Integradora</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── Panel fijo de estado ──────────────────── */
+#status-bar {
+  position: fixed;
+  top: 48px;
+  right: 0;
+  width: 220px;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0 0 0 var(--radius);
+  padding: 14px 16px;
+  z-index: 150;
+  box-shadow: -4px 4px 20px rgba(0,0,0,.35);
+}
+.sb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sb-row:last-child { margin-bottom: 0; }
+.sb-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.sb-val {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.sb-val.danger { color: #f87171; }
+.sb-val.success { color: var(--green); }
+.sb-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+.sb-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+.sb-progress-track {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.sb-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width .3s;
+}
+
+/* ── Ajuste de container por el panel fijo ── */
+.container { padding-right: 240px; }
+@media(max-width:760px) {
+  #status-bar { display: none; }
+  .container  { padding-right: 16px; }
+}
+
+/* ── Módulo badge ───────────────────────────── */
+.mod-badge {
+  display: inline-block;
+  border-radius: 99px;
+  padding: 2px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.mb1 { background:rgba(34,211,170,.12); color:#34d399; }
+.mb2 { background:rgba(167,139,250,.12); color:#a78bfa; }
+.mb3 { background:rgba(34,211,238,.12); color:#22d3ee; }
+.mb4 { background:rgba(251,191,36,.12);  color:#fbbf24; }
+.mb0 { background:rgba(124,106,247,.12); color:var(--accent); }
+
+/* ── Opción de pregunta ─────────────────────── */
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all .12s;
+  margin-bottom: 7px;
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.option:hover:not(.locked) {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--text);
+}
+.option.selected {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 600;
+}
+.option.locked {
+  pointer-events: none;
+  cursor: default;
+  opacity: .45;
+}
+.option.locked.selected {
+  opacity: 1;
+}
+.option.reveal-ok {
+  border-color: var(--green) !important;
+  background: var(--green-bg) !important;
+  color: var(--green) !important;
+  opacity: 1 !important;
+}
+.option.reveal-err {
+  border-color: #f87171 !important;
+  background: rgba(239,68,68,.08) !important;
+  color: #f87171 !important;
+  opacity: 1 !important;
+}
+.opt-letter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Badge de respuesta registrada ─────────── */
+.lock-badge {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .08em;
+  margin-top: 6px;
+}
+.lock-badge.show { display: block; }
+
+/* ── Pregunta card ──────────────────────────── */
+.question-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  transition: border-color .2s;
+}
+.question-card.answered {
+  border-color: var(--border2);
+}
+.q-number {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.q-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+  line-height: 1.55;
+}
+.options { display: flex; flex-direction: column; }
+
+/* ── Pantalla de resultados ─────────────────── */
+#result-panel {
+  display: none;
+  margin-top: 32px;
+}
+.res-hero {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.res-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(124,106,247,.08) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.res-name {
+  font-size: clamp(24px,4vw,40px);
+  font-weight: 900;
+  background: linear-gradient(
+    135deg, var(--accent), #f59e0b
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+.res-grupo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.res-score-big {
+  font-family: var(--font-mono);
+  font-size: clamp(52px,10vw,88px);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.res-score-sub {
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--font-mono);
+  margin-bottom: 18px;
+}
+.res-rank {
+  display: inline-block;
+  padding: 5px 22px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  margin-bottom: 20px;
+}
+.rk-s { color:#f59e0b; border:2px solid #f59e0b; background:rgba(245,158,11,.1); }
+.rk-a { color:#34d399; border:2px solid #34d399; background:rgba(52,211,170,.1); }
+.rk-b { color:#a78bfa; border:2px solid var(--accent); background:var(--accent-glow); }
+.rk-c { color:var(--text2); border:2px solid var(--border2); background:transparent; }
+
+.res-infr-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.infr-ok  { background:rgba(52,211,170,.1); color:#34d399; border:1.5px solid #34d399; }
+.infr-bad { background:rgba(239,68,68,.1);  color:#f87171; border:1.5px solid #f87171; }
+
+.res-stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.rs-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 10px;
+  text-align: center;
+}
+.rs-val {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.rs-lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+/* ── Desglose de respuestas ─────────────────── */
+.bd-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 80px;
+  align-items: start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bd-row:last-child { border-bottom: none; }
+.bd-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text2);
+  padding-top: 2px;
+}
+.bd-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.bd-sel  { font-family:var(--font-mono); font-size:11px; color:var(--text2); margin-top:3px; }
+.bd-ans  { font-family:var(--font-mono); font-size:11px; color:var(--green); margin-top:2px; }
+.bd-status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  padding-top: 2px;
+}
+.bd-status.ok   { color: var(--green); }
+.bd-status.fail { color: #f87171; }
+
+/* ── Infracciones list ──────────────────────── */
+.infr-list {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 2;
+}
+.infr-item { color: #f87171; }
+
+/* ── Alerta overlay ─────────────────────────── */
+#alert-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+#alert-overlay.show { display: flex; }
+.alert-box {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-top: 3px solid #f87171;
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+}
+.alert-icon { font-size: 36px; margin-bottom: 12px; }
+.alert-box h3 {
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.alert-box p {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+.alert-infr {
+  display: inline-block;
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  border-radius: 99px;
+  padding: 4px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #f87171;
+  margin-bottom: 20px;
+}
+
+@media(max-width:580px) {
+  .res-stats { grid-template-columns: 1fr 1fr; }
+  .bd-row { grid-template-columns: 36px 1fr 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ═══════════════════════════════ -->
+<div id="topbar">
+  <div class="tb-left">
+    <span class="tb-materia">EmoSense</span>
+    <span class="tb-semestre">
+      Evaluación Integradora · 25 preguntas
+    </span>
+  </div>
+  <div class="tb-right">
+    <span id="infr-badge"
+          style="display:none;
+                 font-family:var(--font-mono);
+                 font-size:11px;color:#f87171">
+      ⚠ <span id="infr-topbar">0</span> infracc.
+    </span>
+    <div id="timer">60:00</div>
+    <button id="theme-toggle"
+            onclick="toggleTheme()">🌙</button>
+  </div>
+</div>
+
+<!-- ══ PANEL FIJO DE ESTADO ═════════════════ -->
+<div id="status-bar">
+  <div class="sb-row">
+    <span class="sb-label">Alumno</span>
+    <span class="sb-name" id="sb-name">—</span>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-row">
+    <span class="sb-label">Respondidas</span>
+    <span class="sb-val"
+          id="sb-answered">0/25</span>
+  </div>
+  <div class="sb-row">
+    <span class="sb-label">Infracciones</span>
+    <span class="sb-val danger"
+          id="sb-infr">0</span>
+  </div>
+  <div class="sb-row">
+    <span class="sb-label">Tiempo</span>
+    <span class="sb-val"
+          id="sb-timer">60:00</span>
+  </div>
+  <div class="sb-progress-track">
+    <div class="sb-progress-fill"
+         id="sb-prog" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- ══ CONTENEDOR PRINCIPAL ═════════════════ -->
+<div class="container">
+
+  <!-- Encabezado -->
+  <div class="eval-header">
+    <div class="eval-tag">
+      Evaluación Integradora · Proyecto EmoSense
+    </div>
+    <h1>
+      EmoSense — Proyecto Completo<br>
+      25 preguntas · 100 puntos
+    </h1>
+    <div class="eval-sub">
+      Marco teórico · Dataset · Optimización ·
+      Chat · App Completa
+    </div>
+    <div class="eval-meta">
+      <span>⏱ 60 minutos</span>
+      <span>📋 25 preguntas</span>
+      <span>🔒 Respuesta irreversible</span>
+      <span>⚠ Infracciones registradas</span>
+    </div>
+  </div>
+
+  <!-- Datos del alumno -->
+  <div class="student-card">
+    <div class="sc-title">Datos del alumno</div>
+    <div class="sc-grid">
+      <div class="sc-field">
+        <label>Nombre completo</label>
+        <input type="text" id="inp-nombre"
+               placeholder="Tu nombre completo"
+               oninput="updateName()">
+      </div>
+      <div class="sc-field">
+        <label>Grupo</label>
+        <input type="text" id="inp-grupo"
+               placeholder="Ej: LSC-2B">
+      </div>
+      <div class="sc-field">
+        <label>Fecha</label>
+        <input type="text" id="inp-fecha">
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de progreso -->
+  <div class="progress-wrap">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill"
+           id="prog-fill"></div>
+    </div>
+    <span class="progress-label"
+          id="prog-label">
+      0 / 25 respondidas
+    </span>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       PREGUNTAS — generadas por JavaScript
+  ════════════════════════════════════════ -->
+  <div id="questions-wrap"></div>
+
+  <!-- Botón enviar -->
+  <div class="submit-wrap">
+    <button class="btn btn-primary btn-block"
+            id="submit-btn"
+            onclick="submitEval()">
+      Entregar evaluación
+    </button>
+    <div class="submit-note">
+      Cada respuesta queda registrada al instante
+      y no puede modificarse.
+      Cuando termines haz clic en Entregar.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       RESULTADOS
+  ════════════════════════════════════════ -->
+  <div id="result-panel">
+
+    <!-- Hero con nombre, puntuación e infracciones -->
+    <div class="res-hero">
+      <div class="res-name" id="res-name">—</div>
+      <div class="res-grupo" id="res-grupo">
+        Grupo — · EmoSense Evaluación Integradora
+      </div>
+      <div class="res-score-big"
+           id="res-score">0</div>
+      <div class="res-score-sub">
+        de 100 puntos
+      </div>
+      <div id="res-rank-wrap"></div>
+      <br>
+      <div id="res-infr-wrap"></div>
+    </div>
+
+    <!-- Stats rápidas -->
+    <div class="res-stats">
+      <div class="rs-card">
+        <div class="rs-val" id="rs-ok">0</div>
+        <div class="rs-lbl">Correctas</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-val" id="rs-err">0</div>
+        <div class="rs-lbl">Incorrectas</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-val"
+             id="rs-blank">0</div>
+        <div class="rs-lbl">Sin responder</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-val"
+             id="rs-infr2">0</div>
+        <div class="rs-lbl">Infracciones</div>
+      </div>
+    </div>
+
+    <!-- Infracciones detalladas -->
+    <div id="infr-detail-wrap"
+         style="display:none;margin-bottom:20px">
+      <div class="section-title">
+        Registro de infracciones
+      </div>
+      <div class="infr-list" id="infr-list"></div>
+    </div>
+
+    <!-- Desglose de respuestas -->
+    <div class="breakdown">
+      <h3>Desglose de respuestas</h3>
+      <div id="bd-list"></div>
+    </div>
+
+  </div><!-- /result-panel -->
+
+</div><!-- /container -->
+
+<!-- ══ ALERTA INFRACCIÓN ════════════════════ -->
+<div id="alert-overlay">
+  <div class="alert-box">
+    <div class="alert-icon">⚠️</div>
+    <h3 id="alert-title">
+      Infracción detectada
+    </h3>
+    <p id="alert-msg">
+      Esta acción ha sido registrada.
+    </p>
+    <div class="alert-infr"
+         id="alert-count">
+      Infracciones: 1
+    </div>
+    <button class="btn btn-secondary"
+            onclick="closeAlert()">
+      Entendido y continúo
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════ -->
+<script>
+/* ══ DATOS DE PREGUNTAS ══════════════════════ */
+const QUESTIONS = [
+  /* ── Marco Teórico / Inteligencia Emocional */
+  {
+    id:1, pts:4,
+    mod:"Marco Teórico", mbc:"mb0",
+    text:"¿Cuántas emociones básicas universales "
+        +"identificó el psicólogo Paul Ekman "
+        +"y que se usan como clases en EmoSense?",
+    opts:[
+      "A. Cuatro emociones — alegría, tristeza, "
+         +"enojo y miedo.",
+      "B. Seis emociones — alegría, tristeza, "
+         +"enojo, miedo, sorpresa y asco.",
+      "C. Ocho emociones incluyendo vergüenza "
+         +"y orgullo.",
+      "D. Diez emociones según el modelo "
+         +"completo de Ekman.",
+    ],
+    correct:"b",
+  },
+  {
+    id:2, pts:4,
+    mod:"Marco Teórico", mbc:"mb0",
+    text:"Según Daniel Goleman, ¿cuál componente "
+        +"de la Inteligencia Emocional "
+        +"implementa el diccionario RESPUESTAS "
+        +"del chat EmoSense?",
+    opts:[
+      "A. Autoconciencia — identificar las "
+         +"propias emociones.",
+      "B. Autorregulación — controlar impulsos "
+         +"emocionales propios.",
+      "C. Empatía — reconocer la emoción del "
+         +"otro y responder apropiadamente "
+         +"sin minimizar.",
+      "D. Motivación — generar entusiasmo "
+         +"en el interlocutor.",
+    ],
+    correct:"c",
+  },
+  {
+    id:3, pts:4,
+    mod:"Marco Teórico", mbc:"mb0",
+    text:"En el proyecto EmoSense, ¿qué par de "
+        +"emociones presenta mayor confusión en "
+        +"la matriz 6×6 y por qué?",
+    opts:[
+      "A. Alegría y Enojo — porque las dos "
+         +"tienen alta intensidad emocional.",
+      "B. Tristeza y Miedo — porque comparten "
+         +"vocabulario de angustia y desesperación.",
+      "C. Sorpresa y Alegría — porque ambas "
+         +"son emociones positivas.",
+      "D. Asco y Tristeza — porque las dos "
+         +"son emociones de baja energía.",
+    ],
+    correct:"b",
+  },
+
+  /* ── Módulo 1 — Dataset y Modelo Base ──── */
+  {
+    id:4, pts:4,
+    mod:"Módulo 1 · Dataset", mbc:"mb1",
+    text:"¿Cuántas frases contiene el dataset "
+        +"base creado en el Módulo 1 "
+        +"de EmoSense?",
+    opts:[
+      "A. 120 frases — 20 por emoción.",
+      "B. 150 frases — 25 por emoción.",
+      "C. 180 frases — 30 por emoción.",
+      "D. 240 frases — 40 por emoción.",
+    ],
+    correct:"c",
+  },
+  {
+    id:5, pts:4,
+    mod:"Módulo 1 · TF-IDF", mbc:"mb1",
+    text:"¿Qué realiza TF-IDF en el pipeline "
+        +"de EmoSense?",
+    opts:[
+      "A. Clasifica el texto directamente "
+         +"en una de las 6 emociones.",
+      "B. Convierte las frases de texto en "
+         +"vectores numéricos que el modelo "
+         +"puede procesar.",
+      "C. Elimina las palabras con tildes "
+         +"para normalizar el español.",
+      "D. Divide el dataset en conjuntos "
+         +"de entrenamiento y prueba.",
+    ],
+    correct:"b",
+  },
+  {
+    id:6, pts:4,
+    mod:"Módulo 1 · División", mbc:"mb1",
+    text:"¿Qué resuelve el parámetro "
+        +"stratify=etiquetas en "
+        +"train_test_split del Módulo 1?",
+    opts:[
+      "A. Ordena las frases de menor "
+         +"a mayor longitud antes de dividir.",
+      "B. Garantiza que cada emoción esté "
+         +"representada proporcionalmente "
+         +"en entrenamiento y en prueba.",
+      "C. Duplica las muestras de emociones "
+         +"con menos frases para equilibrar.",
+      "D. Establece el porcentaje exacto de "
+         +"datos reservados para prueba.",
+    ],
+    correct:"b",
+  },
+  {
+    id:7, pts:4,
+    mod:"Módulo 1 · Hiperparámetros", mbc:"mb1",
+    text:"¿Qué efecto tiene max_depth=None "
+        +"en el RandomForestClassifier "
+        +"del Módulo 1?",
+    opts:[
+      "A. Establece una profundidad máxima "
+         +"de 10 niveles por árbol.",
+      "B. Permite que cada árbol crezca sin "
+         +"límite hasta hojas de 1 muestra, "
+         +"arriesgando sobreajuste.",
+      "C. Desactiva el Random Forest y usa "
+         +"solo un árbol de decisión.",
+      "D. Fija la profundidad mínima "
+         +"necesaria para clasificar.",
+    ],
+    correct:"b",
+  },
+  {
+    id:8, pts:4,
+    mod:"Módulo 1 · Métricas", mbc:"mb1",
+    text:"El modelo EmoSense obtiene F1 alto "
+        +"en entrenamiento pero bajo en prueba. "
+        +"¿Qué problema indica esto?",
+    opts:[
+      "A. El dataset tiene frases duplicadas "
+         +"que confunden al modelo.",
+      "B. Sobreajuste — el modelo memorizó "
+         +"el entrenamiento y no generaliza "
+         +"a datos nuevos.",
+      "C. Subajuste — el vocabulario TF-IDF "
+         +"es demasiado pequeño.",
+      "D. El hiperparámetro n_estimators "
+         +"es demasiado bajo.",
+    ],
+    correct:"b",
+  },
+
+  /* ── Módulo 2 — Optimización ────────────── */
+  {
+    id:9, pts:4,
+    mod:"Módulo 2 · Pipeline", mbc:"mb2",
+    text:"¿Por qué se usa Pipeline(TF-IDF, RF) "
+        +"dentro de cross_val_score() "
+        +"en lugar de vectorizar antes del CV?",
+    opts:[
+      "A. Para hacer el código más corto "
+         +"y fácil de leer.",
+      "B. Evita data leakage — el vocabulario "
+         +"se aprende dentro de cada pliegue, "
+         +"no con datos de validación.",
+      "C. Porque cross_val_score solo acepta "
+         +"texto crudo, no vectores.",
+      "D. Para aplicar regularización automática "
+         +"a los pesos TF-IDF.",
+    ],
+    correct:"b",
+  },
+  {
+    id:10, pts:4,
+    mod:"Módulo 2 · Cross-Validation", mbc:"mb2",
+    text:"¿Qué garantiza StratifiedKFold "
+        +"con n_splits=5 en el Módulo 2?",
+    opts:[
+      "A. Que cada pliegue tenga exactamente "
+         +"el mismo número de muestras.",
+      "B. Que cada pliegue contenga muestras "
+         +"de las 6 emociones en proporciones "
+         +"similares.",
+      "C. Que el modelo se entrene 5 veces "
+         +"con el dataset completo.",
+      "D. Que se creen 5 modelos distintos "
+         +"y se promedia su salida.",
+    ],
+    correct:"b",
+  },
+  {
+    id:11, pts:4,
+    mod:"Módulo 2 · Hiperparámetros", mbc:"mb2",
+    text:"¿Para qué sirve min_samples_leaf "
+        +"en el RandomForestClassifier?",
+    opts:[
+      "A. Define el número mínimo de árboles "
+         +"que debe tener el bosque.",
+      "B. Establece el vocabulario mínimo "
+         +"del vectorizador TF-IDF.",
+      "C. Obliga a cada hoja a representar "
+         +"al menos N muestras, reduciendo "
+         +"la memorización y el sobreajuste.",
+      "D. Controla la profundidad mínima "
+         +"de cada árbol del bosque.",
+    ],
+    correct:"c",
+  },
+  {
+    id:12, pts:4,
+    mod:"Módulo 2 · Modelo Final", mbc:"mb2",
+    text:"En guardar_mejor(), el modelo se "
+        +"reentrena con TODOS los datos antes "
+        +"de guardarlo. ¿Por qué?",
+    opts:[
+      "A. Porque joblib.dump() solo acepta "
+         +"modelos entrenados con el dataset "
+         +"completo.",
+      "B. Porque la selección de config ya "
+         +"se hizo con CV; ahora se aprovecha "
+         +"toda la información disponible para "
+         +"el modelo productivo.",
+      "C. Para que el modelo pueda evaluarse "
+         +"a sí mismo sin datos externos.",
+      "D. Para reducir el tamaño del .pkl "
+         +"al mínimo posible.",
+    ],
+    correct:"b",
+  },
+  {
+    id:13, pts:4,
+    mod:"Módulo 2 · Algoritmo", mbc:"mb2",
+    text:"¿Por qué Logistic Regression puede "
+        +"superar a Random Forest en la "
+        +"clasificación de emociones con TF-IDF?",
+    opts:[
+      "A. Porque tiene más hiperparámetros "
+         +"configurables que Random Forest.",
+      "B. Porque los vectores TF-IDF son "
+         +"muy dispersos y Logistic Regression "
+         +"maneja mejor ese tipo de datos.",
+      "C. Porque no necesita vectorización "
+         +"previa del texto.",
+      "D. Porque es el único clasificador "
+         +"compatible con Pipeline.",
+    ],
+    correct:"b",
+  },
+
+  /* ── Métricas ──────────────────────────── */
+  {
+    id:14, pts:4,
+    mod:"Métricas", mbc:"mb0",
+    text:"¿Qué representa la diagonal principal "
+        +"de la matriz de confusión 6×6 "
+        +"de EmoSense?",
+    opts:[
+      "A. Los errores más frecuentes "
+         +"del modelo por emoción.",
+      "B. Las predicciones incorrectas "
+         +"de cada clase.",
+      "C. Los aciertos del modelo — "
+         +"casos donde la predicción coincide "
+         +"con la emoción real.",
+      "D. El porcentaje de cada emoción "
+         +"en el dataset.",
+    ],
+    correct:"c",
+  },
+  {
+    id:15, pts:4,
+    mod:"Métricas", mbc:"mb0",
+    text:"¿Qué indica average='weighted' "
+        +"en el cálculo de F1-Score?",
+    opts:[
+      "A. Calcula el promedio simple "
+         +"de F1 de todas las emociones.",
+      "B. Solo calcula el F1 de la emoción "
+         +"con más muestras.",
+      "C. Pondera el F1 de cada emoción "
+         +"según cuántas muestras tiene "
+         +"esa clase.",
+      "D. Calcula el F1 máximo entre "
+         +"todas las emociones.",
+    ],
+    correct:"c",
+  },
+
+  /* ── Módulo 3 — Chat tkinter ───────────── */
+  {
+    id:16, pts:4,
+    mod:"Módulo 3 · tkinter", mbc:"mb3",
+    text:"¿Qué widget de tkinter se usa "
+        +"para el área de chat con scroll "
+        +"en el Módulo 3?",
+    opts:[
+      "A. tk.Text con scrollbar manual "
+         +"de posición absoluta.",
+      "B. scrolledtext.ScrolledText — "
+         +"incluye scroll integrado "
+         +"y permite insertar texto con tags.",
+      "C. tk.Listbox con configuración "
+         +"de autoescroll activada.",
+      "D. ttk.Treeview en modo chat "
+         +"con columnas de texto.",
+    ],
+    correct:"b",
+  },
+  {
+    id:17, pts:4,
+    mod:"Módulo 3 · Carga del modelo", mbc:"mb3",
+    text:"¿Cómo carga el chat de la Etapa 3 "
+        +"el modelo entrenado en el Módulo 2?",
+    opts:[
+      "A. Vuelve a entrenar el modelo "
+         +"cada vez que abre la ventana.",
+      "B. Usa joblib.load() para cargarlo "
+         +"desde modelos/modelo_optimo.pkl.",
+      "C. Descarga el modelo de internet "
+         +"la primera vez que se ejecuta.",
+      "D. El modelo se escribe directamente "
+         +"en el código fuente del chat.",
+    ],
+    correct:"b",
+  },
+  {
+    id:18, pts:4,
+    mod:"Módulo 3 · Pipeline", mbc:"mb3",
+    text:"¿Cuál es la ventaja de guardar "
+        +"el Pipeline completo en modelo_optimo.pkl "
+        +"en lugar de solo el clasificador?",
+    opts:[
+      "A. Reduce el tamaño del archivo .pkl "
+         +"porque el vectorizador se puede "
+         +"reconstruir.",
+      "B. El chat puede recibir texto crudo "
+         +"directamente en predict() — "
+         +"el Pipeline aplica TF-IDF "
+         +"y clasificación internamente.",
+      "C. El Pipeline permite actualizar "
+         +"el modelo en tiempo real mientras "
+         +"el usuario chatea.",
+      "D. Porque tkinter no puede importar "
+         +"archivos .pkl que solo contienen "
+         +"un clasificador.",
+    ],
+    correct:"b",
+  },
+
+  /* ── Módulo 4 — App Completa ───────────── */
+  {
+    id:19, pts:4,
+    mod:"Módulo 4 · Integración", mbc:"mb4",
+    text:"¿Qué agrega el Módulo 4 "
+        +"que no tenía el Módulo 3?",
+    opts:[
+      "A. Detecta más emociones con "
+         +"mayor precisión por sesión.",
+      "B. Historial de sesión en tiempo real, "
+         +"emoción dominante y generación "
+         +"de reporte .txt + gráfica .png "
+         +"al cerrar.",
+      "C. Guarda el modelo de nuevo "
+         +"después de cada conversación.",
+      "D. Tiene respuestas empáticas "
+         +"más elaboradas.",
+    ],
+    correct:"b",
+  },
+  {
+    id:20, pts:4,
+    mod:"Módulo 4 · matplotlib", mbc:"mb4",
+    text:"¿Por qué matplotlib.use('TkAgg') "
+        +"debe declararse ANTES de cualquier "
+        +"import tkinter en el Módulo 4?",
+    opts:[
+      "A. Porque tkinter necesita conocer "
+         +"el backend de matplotlib para "
+         +"inicializar su event loop.",
+      "B. Porque el backend debe configurarse "
+         +"antes de importar pyplot; si pyplot "
+         +"ya fue importado, el cambio lanza "
+         +"error o se ignora.",
+      "C. Para que las figuras usen la misma "
+         +"paleta de colores que tkinter.",
+      "D. Es solo una convención de estilo "
+         +"sin efecto real en la ejecución.",
+    ],
+    correct:"b",
+  },
+  {
+    id:21, pts:4,
+    mod:"Módulo 4 · Reporte", mbc:"mb4",
+    text:"Al cerrar la sesión en la Etapa 4, "
+        +"¿qué archivos se generan y "
+        +"dónde se guardan?",
+    opts:[
+      "A. Un archivo .csv en la carpeta "
+         +"raíz con las predicciones.",
+      "B. Un reporte .txt en reportes/ y "
+         +"una gráfica .png en graficas/ "
+         +"con la distribución emocional.",
+      "C. Un nuevo modelo .pkl que reemplaza "
+         +"al modelo_optimo.pkl.",
+      "D. Una copia del dataset ampliado "
+         +"con las frases de la sesión.",
+    ],
+    correct:"b",
+  },
+  {
+    id:22, pts:4,
+    mod:"Módulo 4 · Dataset", mbc:"mb4",
+    text:"¿Cuál estrategia hace que las "
+        +"frases nuevas agregadas en la Etapa 4 "
+        +"realmente mejoren el modelo?",
+    opts:[
+      "A. Que sean frases muy cortas "
+         +"para que el modelo las memorice.",
+      "B. Que usen vocabulario específico "
+         +"de esa emoción, diferente al de "
+         +"las emociones con que se confunde.",
+      "C. Que sean copiadas de internet "
+         +"para asegurar vocabulario correcto.",
+      "D. Que se agreguen por igual "
+         +"a todas las emociones sin importar "
+         +"cuál tiene el F1 más bajo.",
+    ],
+    correct:"b",
+  },
+
+  /* ── Integración ───────────────────────── */
+  {
+    id:23, pts:4,
+    mod:"Integración", mbc:"mb0",
+    text:"¿Cuál es la diferencia entre un "
+        +"parámetro que aprende el modelo y un "
+        +"hiperparámetro en EmoSense?",
+    opts:[
+      "A. Los parámetros son más importantes "
+         +"que los hiperparámetros para el "
+         +"rendimiento final.",
+      "B. Los parámetros (pesos TF-IDF, "
+         +"estructura de los árboles) los "
+         +"aprende el modelo durante fit(); "
+         +"los hiperparámetros (n_estimators, "
+         +"max_depth) los define el programador "
+         +"antes de entrenar.",
+      "C. Los hiperparámetros se aprenden del "
+         +"dataset; los parámetros se configuran "
+         +"manualmente.",
+      "D. Son sinónimos — la distinción es "
+         +"solo de nomenclatura en sklearn.",
+    ],
+    correct:"b",
+  },
+  {
+    id:24, pts:4,
+    mod:"Integración", mbc:"mb0",
+    text:"¿Cuál es la función de limpiar_texto() "
+        +"que aparece en todos los módulos "
+        +"del proyecto?",
+    opts:[
+      "A. Detectar el idioma del texto "
+         +"para saber si clasificar.",
+      "B. Convertir emociones detectadas "
+         +"a texto descriptivo para el usuario.",
+      "C. Preprocesar el texto eliminando "
+         +"caracteres no alfabéticos y "
+         +"convirtiendo a minúsculas para "
+         +"estandarizar la entrada al modelo.",
+      "D. Validar que el texto tiene "
+         +"al menos 10 palabras para "
+         +"poder clasificarlo.",
+    ],
+    correct:"c",
+  },
+  {
+    id:25, pts:4,
+    mod:"Integración", mbc:"mb0",
+    text:"Si alguien te pregunta para qué sirve "
+        +"EmoSense, ¿cuál es la descripción "
+        +"más completa del proyecto?",
+    opts:[
+      "A. Es un chat que traduce texto al "
+         +"inglés y detecta el idioma.",
+      "B. Es una aplicación que usa Machine "
+         +"Learning para detectar emociones "
+         +"en texto en español, responde con "
+         +"empatía basada en Goleman y genera "
+         +"un análisis de la sesión emocional.",
+      "C. Es una calculadora de probabilidades "
+         +"que mide qué tan positivo es un "
+         +"mensaje.",
+      "D. Es un analizador de errores de Python "
+         +"que detecta problemas en el código.",
+    ],
+    correct:"b",
+  },
+];
+
+/* ══ ESTADO ══════════════════════════════════ */
+const TOTAL    = QUESTIONS.length;
+const PTS_EACH = 4;
+let answers    = {};
+let locked     = {};
+let infractions= [];
+let submitted  = false;
+let timerSec   = 60 * 60;
+let timerInt   = null;
+
+/* ══ LETRAS ══════════════════════════════════ */
+const LETTERS  = ['A','B','C','D'];
+const OPT_VALS = ['a','b','c','d'];
+
+/* ══ GENERAR PREGUNTAS ═══════════════════════ */
+function buildQuestions() {
+  const wrap =
+    document.getElementById('questions-wrap');
+  QUESTIONS.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = 'qcard-' + q.id;
+
+    const badge =
+      `<span class="mod-badge ${q.mbc}">
+         ${q.mod}
+       </span>`;
+    const num  =
+      `<div class="q-number">
+         Pregunta ${String(q.id).padStart(2,'0')}
+         · ${q.pts} pts
+         ${badge}
+       </div>`;
+    const text =
+      `<div class="q-text">${q.text}</div>`;
+
+    let opts = '<div class="options">';
+    q.opts.forEach((o, i) => {
+      const val = OPT_VALS[i];
+      opts +=
+        `<div class="option"
+              id="opt-${q.id}-${val}"
+              onclick="pickOpt(${q.id},'${val}')">
+           <span class="opt-letter">
+             ${LETTERS[i]}
+           </span>
+           <span>${o}</span>
+         </div>`;
+    });
+    opts += '</div>';
+    opts +=
+      `<div class="lock-badge"
+            id="lbadge-${q.id}">
+         🔒 Respuesta registrada — no editable
+       </div>`;
+
+    card.innerHTML = num + text + opts;
+    wrap.appendChild(card);
+  });
+}
+
+/* ══ SELECCIONAR OPCIÓN ══════════════════════ */
+function pickOpt(qid, val) {
+  if (locked[qid] || submitted) return;
+
+  locked[qid]  = true;
+  answers[qid] = val;
+
+  /* Aplicar estilo a opciones */
+  OPT_VALS.forEach(v => {
+    const el = document.getElementById(
+      `opt-${qid}-${v}`
+    );
+    if (!el) return;
+    el.classList.add('locked');
+    if (v === val) el.classList.add('selected');
+  });
+
+  /* Mostrar badge de bloqueo */
+  const lb = document.getElementById(
+    `lbadge-${qid}`
+  );
+  if (lb) lb.classList.add('show');
+
+  /* Marcar card como respondida */
+  const card = document.getElementById(
+    `qcard-${qid}`
+  );
+  if (card) card.classList.add('answered');
+
+  updateProgress();
+}
+
+/* ══ PROGRESO ════════════════════════════════ */
+function updateProgress() {
+  const n   = Object.keys(answers).length;
+  const pct = (n / TOTAL) * 100;
+  document.getElementById('prog-fill')
+    .style.width = pct + '%';
+  document.getElementById('prog-label')
+    .textContent = `${n} / ${TOTAL} respondidas`;
+  document.getElementById('sb-answered')
+    .textContent = `${n}/${TOTAL}`;
+  document.getElementById('sb-prog')
+    .style.width = pct + '%';
+}
+
+/* ══ NOMBRE EN TIEMPO REAL ═══════════════════ */
+function updateName() {
+  const n =
+    document.getElementById('inp-nombre')
+            .value.trim();
+  document.getElementById('sb-name')
+    .textContent = n || '—';
+}
+
+/* ══ TIMER ═══════════════════════════════════ */
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return m + ':' + String(r).padStart(2,'0');
+}
+function startTimer() {
+  const tp = document.getElementById('timer');
+  const ts = document.getElementById('sb-timer');
+  timerInt = setInterval(() => {
+    timerSec--;
+    const f = fmtTime(timerSec);
+    tp.textContent = f;
+    ts.textContent = f;
+    if (timerSec <= 300 && timerSec > 60) {
+      tp.className = 'warn';
+    } else if (timerSec <= 60) {
+      tp.className = 'danger';
+    }
+    if (timerSec <= 0) {
+      clearInterval(timerInt);
+      if (!submitted) submitEval();
+    }
+  }, 1000);
+}
+
+/* ══ INFRACCIONES ════════════════════════════ */
+function addInfraction(type, detail) {
+  const ts = new Date().toLocaleTimeString(
+    'es-MX'
+  );
+  infractions.push({ type, detail, ts });
+  const count = infractions.length;
+
+  document.getElementById('sb-infr')
+    .textContent = count;
+  document.getElementById('infr-topbar')
+    .textContent = count;
+  document.getElementById('infr-badge')
+    .style.display = 'inline';
+  document.getElementById('alert-count')
+    .textContent = `Infracciones acumuladas: ${count}`;
+  document.getElementById('alert-title')
+    .textContent =
+      type === 'tab'
+        ? 'Cambio de pestaña detectado'
+        : type === 'copy'
+          ? 'Intento de copia detectado'
+          : type === 'rclick'
+            ? 'Clic derecho detectado'
+            : 'Acción no permitida';
+  document.getElementById('alert-msg')
+    .textContent =
+      `"${detail}" ha sido registrado. `
+    + 'Esta acción aparecerá en tu reporte final.';
+  document.getElementById('alert-overlay')
+    .classList.add('show');
+}
+
+function closeAlert() {
+  document.getElementById('alert-overlay')
+    .classList.remove('show');
+}
+
+/* ══ ENVIAR ══════════════════════════════════ */
+function submitEval() {
+  if (submitted) return;
+  const nombre =
+    document.getElementById('inp-nombre')
+            .value.trim();
+  if (!nombre) {
+    alert('Escribe tu nombre antes de enviar.');
+    return;
+  }
+  const sin = TOTAL - Object.keys(answers).length;
+  if (sin > 0) {
+    const ok = confirm(
+      `Tienes ${sin} pregunta(s) sin responder.\n`
+    + '¿Deseas entregar de todas formas?'
+    );
+    if (!ok) return;
+  }
+  submitted = true;
+  clearInterval(timerInt);
+  document.getElementById('submit-btn')
+          .disabled = true;
+
+  /* Revelar respuestas correctas/incorrectas */
+  QUESTIONS.forEach(q => {
+    const chosen  = answers[q.id] || null;
+    const correct = q.correct;
+    OPT_VALS.forEach(v => {
+      const el = document.getElementById(
+        `opt-${q.id}-${v}`
+      );
+      if (!el) return;
+      el.classList.remove(
+        'selected', 'locked'
+      );
+      if (v === correct) {
+        el.classList.add('reveal-ok');
+      } else if (v === chosen && v !== correct) {
+        el.classList.add('reveal-err');
+      } else {
+        el.style.opacity = '.3';
+        el.style.pointerEvents = 'none';
+      }
+    });
+  });
+
+  /* Calcular puntaje */
+  let ok = 0, err = 0, blank = 0;
+  QUESTIONS.forEach(q => {
+    const ch = answers[q.id] || null;
+    if (!ch)             blank++;
+    else if (ch === q.correct) ok++;
+    else                 err++;
+  });
+  const score = ok * PTS_EACH;
+  const pen   = Math.min(infractions.length * 2, 20);
+  const total = Math.max(0, score - pen);
+
+  /* Rango */
+  const rank =
+    total >= 90 ? ['S','rk-s']
+    : total >= 75 ? ['A','rk-a']
+    : total >= 60 ? ['B','rk-b']
+    : ['C','rk-c'];
+
+  /* Mostrar hero */
+  const grupo =
+    document.getElementById('inp-grupo')
+            .value.trim() || '—';
+  document.getElementById('res-name')
+    .textContent = nombre;
+  document.getElementById('res-grupo')
+    .textContent =
+    `${grupo} · EmoSense Evaluación Integradora`;
+  document.getElementById('res-score')
+    .textContent = total;
+  document.getElementById('res-rank-wrap')
+    .innerHTML =
+    `<span class="res-rank ${rank[1]}">
+       RANGO  ${rank[0]}
+     </span>`;
+
+  /* Infracciones */
+  const iCount = infractions.length;
+  document.getElementById('res-infr-wrap')
+    .innerHTML = iCount === 0
+    ? `<span class="res-infr-block infr-ok">
+         ✓ Sin infracciones
+       </span>`
+    : `<span class="res-infr-block infr-bad">
+         ⚠ ${iCount} infracción(es) — 
+         penalización: −${pen} pts
+       </span>`;
+
+  /* Stats */
+  document.getElementById('rs-ok')
+    .textContent = ok;
+  document.getElementById('rs-err')
+    .textContent = err;
+  document.getElementById('rs-blank')
+    .textContent = blank;
+  document.getElementById('rs-infr2')
+    .textContent = iCount;
+
+  /* Detalle de infracciones */
+  if (iCount > 0) {
+    document.getElementById(
+      'infr-detail-wrap'
+    ).style.display = 'block';
+    document.getElementById('infr-list')
+      .innerHTML = infractions.map(i =>
+        `<div class="infr-item">`
+       +`[${i.ts}] ${i.type.toUpperCase()}`
+       +` — ${i.detail}`
+       +`</div>`
+      ).join('');
+  }
+
+  /* Desglose */
+  const OPTLBL = ['A','B','C','D'];
+  const bd = QUESTIONS.map(q => {
+    const ch = answers[q.id] || null;
+    const ok2 = ch === q.correct;
+    const chL = ch
+      ? OPTLBL[OPT_VALS.indexOf(ch)]
+      : '—';
+    const crL = OPTLBL[
+      OPT_VALS.indexOf(q.correct)
+    ];
+    return `<div class="bd-row">`
+      + `<span class="bd-num">`
+      +   `P${String(q.id).padStart(2,'0')}`
+      + `</span>`
+      + `<span class="bd-text">`
+      +   q.text.substring(0,60)
+      +   (q.text.length>60?'…':'')
+      +   `<div class="bd-sel">`
+      +     `Tu respuesta: ${chL}`
+      +   `</div>`
+      +   (!ok2 && ch
+          ? `<div class="bd-ans">`
+          +   `Correcta: ${crL}`
+          + `</div>` : '')
+      + `</span>`
+      + `<span class="bd-status `
+      +   (ok2 ? 'ok' : 'fail') + '">'
+      +   (ok2
+          ? `✓ +${PTS_EACH}`
+          : (ch ? '✗ 0' : '– 0'))
+      + `</span>`
+      + `</div>`;
+  });
+  document.getElementById('bd-list')
+    .innerHTML = bd.join('');
+
+  /* Mostrar panel y scroll */
+  document.getElementById('result-panel')
+    .style.display = 'block';
+  document.getElementById('result-panel')
+    .scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ══ EVENTOS DE INFRACCIÓN ═══════════════════ */
+document.addEventListener(
+  'visibilitychange', () => {
+    if (document.hidden && !submitted) {
+      addInfraction(
+        'tab',
+        'Salió de la pestaña de la evaluación'
+      );
+    }
+  }
+);
+
+document.addEventListener('contextmenu', e => {
+  if (!submitted) {
+    e.preventDefault();
+    addInfraction(
+      'rclick',
+      'Clic derecho sobre la página'
+    );
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (submitted) return;
+  const key = e.key;
+  const ctrl = e.ctrlKey || e.metaKey;
+  const shift = e.shiftKey;
+  if (key === 'F12'
+      || (ctrl && shift && key === 'I')
+      || (ctrl && shift && key === 'J')
+      || (ctrl && key === 'u')
+      || (ctrl && key === 'U')) {
+    e.preventDefault();
+    addInfraction(
+      'devtools',
+      `Acceso a herramientas de desarrollador (${key})`
+    );
+  }
+  if (ctrl && (key === 'c' || key === 'C')) {
+    const sel =
+      window.getSelection()?.toString().trim();
+    if (sel && sel.length > 3) {
+      addInfraction(
+        'copy',
+        `Intento de copiar: "${sel.substring(0,40)}..."`
+      );
+    }
+  }
+  if (key === 'PrintScreen') {
+    addInfraction(
+      'screenshot',
+      'Tecla PrintScreen presionada'
+    );
+  }
+});
+
+/* ══ TEMA ════════════════════════════════════ */
+function toggleTheme() {
+  const d = document.documentElement;
+  const isDark = !d.hasAttribute('data-theme');
+  d.setAttribute('data-theme',
+    isDark ? 'light' : '');
+  document.getElementById('theme-toggle')
+    .textContent = isDark ? '🌙' : '☀️';
+}
+
+/* ══ INIT ════════════════════════════════════ */
+window.addEventListener('load', () => {
+  buildQuestions();
+  startTimer();
+  document.getElementById('inp-fecha').value =
+    new Date().toLocaleDateString('es-MX');
+});
+</script>
+</body>
+</html>
