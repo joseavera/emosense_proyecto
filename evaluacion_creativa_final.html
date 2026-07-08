@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0">
+<title>EmoSense · Evaluación Creativa Final</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ── Barra de puntaje sticky ────────────────── */
+#score-bar{
+  position:sticky;top:48px;z-index:120;
+  background:var(--bg);
+  border-bottom:1px solid var(--border2);
+  padding:8px 20px;
+  display:flex;align-items:center;gap:10px;
+  flex-wrap:wrap;
+}
+.sb-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:99px;padding:4px 12px;
+  font-family:var(--font-mono);font-size:12px;
+}
+.sb-pill .sp-val{
+  font-weight:700;color:var(--accent);
+  transition:color .3s;
+}
+.sb-total{
+  margin-left:auto;
+  font-family:var(--font-mono);
+  font-size:18px;font-weight:900;
+  color:var(--text);
+}
+.sb-total span{color:var(--accent)}
+
+/* ── Código mejorado ────────────────────────── */
+.code-q{
+  background:#0d0d18;border-radius:var(--radius-sm);
+  padding:14px 16px;margin:0 0 14px;
+  font-family:var(--font-mono);font-size:13px;
+  line-height:1.85;color:#94a3b8;
+  border:1px solid var(--border);
+  overflow-x:auto;
+}
+.code-q .kw{color:#c084fc}
+.code-q .fn{color:#60a5fa}
+.code-q .st{color:#86efac}
+.code-q .nm{color:#fb923c}
+.code-q .cm{color:#3f4a5f;font-style:italic}
+.code-q .hl{color:#f9fafb;font-weight:700}
+
+/* ── Opciones de código ─────────────────────── */
+.code-opts{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin-top:4px;
+}
+.code-opt{
+  background:var(--bg3);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:10px 14px;cursor:pointer;
+  font-size:13px;color:var(--text2);
+  transition:all .12s;
+  display:flex;align-items:flex-start;gap:8px;
+}
+.code-opt:hover:not(.locked){
+  border-color:var(--accent);
+  background:var(--accent-glow);color:var(--text);
+}
+.code-opt.selected{
+  border-color:var(--accent);
+  background:var(--accent-glow);
+  color:var(--accent);font-weight:600;
+}
+.code-opt.locked{pointer-events:none;opacity:.5}
+.code-opt.locked.selected{opacity:1}
+.code-opt.reveal-ok{
+  border-color:var(--green)!important;
+  background:var(--green-bg)!important;
+  color:var(--green)!important;opacity:1!important;
+}
+.code-opt.reveal-err{
+  border-color:#f87171!important;
+  background:rgba(239,68,68,.08)!important;
+  color:#f87171!important;opacity:1!important;
+}
+.code-opt .ol{
+  font-family:var(--font-mono);font-size:10px;
+  font-weight:700;min-width:16px;flex-shrink:0;
+  margin-top:2px;
+}
+
+/* ── Columnas relacionadas ──────────────────── */
+.cols-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:16px;margin:14px 0;
+}
+.col-item{
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:11px 14px;cursor:pointer;
+  font-size:13px;color:var(--text2);
+  transition:all .15s;line-height:1.45;
+  display:flex;align-items:center;gap:10px;
+}
+.col-item:hover:not(.matched){
+  border-color:var(--border2);
+  background:var(--bg3);color:var(--text);
+}
+.col-item.sel{
+  border-color:var(--accent);
+  background:var(--accent-glow);
+  color:var(--accent);font-weight:600;
+}
+.col-item.matched{
+  border-color:var(--green);
+  background:var(--green-bg);
+  color:var(--green);pointer-events:none;
+  opacity:1;
+}
+.col-item.wrong{
+  animation:shk .35s ease;
+  border-color:#f87171;
+  background:rgba(239,68,68,.08);
+}
+@keyframes shk{
+  0%,100%{transform:translateX(0)}
+  25%,75%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+}
+.col-num{
+  font-family:var(--font-mono);font-size:11px;
+  font-weight:700;min-width:18px;text-align:center;
+  background:var(--bg3);border-radius:4px;
+  padding:1px 5px;flex-shrink:0;
+}
+.matched-list{
+  margin-top:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.matched-item{
+  display:flex;align-items:center;gap:8px;
+  background:var(--green-bg);
+  border:1px solid var(--green);
+  border-radius:var(--radius-sm);
+  padding:8px 12px;font-size:12.5px;
+  color:var(--green);
+}
+.mi-arrow{color:var(--green);opacity:.6}
+
+/* ── Rellenar espacios ──────────────────────── */
+.word-bank{
+  display:flex;flex-wrap:wrap;gap:7px;
+  margin:14px 0 20px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+}
+.word-chip{
+  background:var(--bg3);
+  border:1.5px solid var(--border2);
+  border-radius:99px;padding:5px 14px;
+  font-family:var(--font-mono);font-size:12px;
+  color:var(--cyan);cursor:pointer;
+  transition:all .12s;font-weight:600;
+}
+.word-chip:hover:not(.used){
+  border-color:var(--accent);
+  background:var(--accent-glow);color:var(--accent);
+}
+.word-chip.sel-word{
+  border-color:var(--accent);
+  background:var(--accent);color:#fff;
+}
+.word-chip.used{
+  opacity:.3;pointer-events:none;
+  text-decoration:line-through;
+}
+.blank-wrap{margin-bottom:16px}
+.blank-label{
+  font-family:var(--font-mono);font-size:10px;
+  color:var(--text2);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:6px;
+}
+.blank-slot{
+  display:inline-block;
+  min-width:90px;
+  border-bottom:2px dashed var(--border2);
+  padding:1px 8px;margin:0 3px;
+  font-family:var(--font-mono);font-size:14px;
+  color:var(--cyan);font-weight:700;
+  cursor:pointer;vertical-align:middle;
+  transition:border-color .15s;text-align:center;
+}
+.blank-slot:hover{border-bottom-color:var(--accent)}
+.blank-slot.filled{
+  border-bottom-color:var(--cyan);
+  background:rgba(34,211,238,.06);
+  border-radius:4px 4px 0 0;
+}
+.blank-slot.correct-blank{
+  color:var(--green);
+  border-bottom-color:var(--green)!important;
+  background:var(--green-bg)!important;
+}
+.blank-slot.wrong-blank{
+  color:#f87171;
+  border-bottom-color:#f87171!important;
+  background:rgba(239,68,68,.06)!important;
+}
+
+/* ── Memorama ────────────────────────────────── */
+.memo-info{
+  display:flex;gap:12px;margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.memo-stat{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:8px 16px;
+  font-family:var(--font-mono);font-size:12px;
+  color:var(--text2);
+}
+.memo-stat span{
+  color:var(--accent);font-weight:700;
+  font-size:16px;
+}
+.memo-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin:14px 0;
+}
+.memo-card{
+  aspect-ratio:3/2.2;
+  perspective:800px;cursor:pointer;
+}
+.memo-inner{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+  border-radius:var(--radius-sm);
+}
+.memo-card.flipped .memo-inner{
+  transform:rotateY(180deg);
+}
+.memo-front,.memo-back{
+  position:absolute;inset:0;
+  backface-visibility:hidden;border-radius:var(--radius-sm);
+  display:flex;align-items:center;
+  justify-content:center;
+  padding:6px;text-align:center;
+}
+.memo-front{
+  background:var(--bg2);
+  border:1.5px solid var(--border2);
+  font-size:24px;
+}
+.memo-back{
+  background:var(--bg3);
+  border:1.5px solid var(--accent);
+  transform:rotateY(180deg);
+  font-family:var(--font-mono);
+  font-size:11px;color:var(--cyan);
+  line-height:1.4;
+}
+.memo-card.matched .memo-inner{
+  transform:rotateY(180deg);
+}
+.memo-card.matched .memo-back{
+  border-color:var(--green)!important;
+  background:var(--green-bg)!important;
+  color:var(--green)!important;
+}
+@keyframes pulse{
+  0%,100%{transform:rotateY(180deg) scale(1)}
+  50%{transform:rotateY(180deg) scale(1.04)}
+}
+.memo-card.matched .memo-inner{
+  animation:pulse .3s ease;
+  transform:rotateY(180deg);
+}
+
+/* ── Misc ────────────────────────────────────── */
+.q-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px 22px;
+  margin-bottom:14px;
+}
+.q-card.answered{border-color:var(--border2)}
+.qn{
+  font-family:var(--font-mono);font-size:10px;
+  color:var(--accent);letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.qt{
+  font-size:14.5px;font-weight:600;color:var(--text);
+  margin-bottom:14px;line-height:1.5;
+}
+
+/* ── Resultado final ─────────────────────────── */
+.res-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin:16px 0;
+}
+.rg-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px;
+  text-align:center;
+}
+.rg-val{
+  font-family:var(--font-mono);font-size:24px;
+  font-weight:800;color:var(--accent);margin-bottom:3px;
+}
+.rg-lbl{
+  font-family:var(--font-mono);font-size:10px;
+  color:var(--text2);text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.rg-max{
+  font-size:11px;color:var(--text2);margin-top:2px;
+}
+
+@media(max-width:600px){
+  .code-opts,.cols-wrap{grid-template-columns:1fr}
+  .memo-grid{grid-template-columns:repeat(4,1fr)}
+  .res-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="tb-left">
+    <span class="tb-materia">EmoSense</span>
+    <span class="tb-semestre">
+      Evaluación Creativa Final
+    </span>
+  </div>
+  <div class="tb-right">
+    <span id="infr-badge" style="display:none;
+          font-family:var(--font-mono);
+          font-size:11px;color:#f87171">
+      ⚠ <span id="infr-cnt">0</span>
+    </span>
+    <div id="timer">45:00</div>
+    <button id="theme-toggle"
+            onclick="toggleTheme()">🌙</button>
+  </div>
+</div>
+
+<!-- BARRA DE PUNTAJE STICKY -->
+<div id="score-bar">
+  <div class="sb-pill">
+    💻 Código
+    <span class="sp-val" id="sp1">0</span>/20
+  </div>
+  <div class="sb-pill">
+    🔗 Columnas
+    <span class="sp-val" id="sp2">0</span>/24
+  </div>
+  <div class="sb-pill">
+    ✍️ Espacios
+    <span class="sp-val" id="sp3">0</span>/20
+  </div>
+  <div class="sb-pill">
+    🃏 Memorama
+    <span class="sp-val" id="sp4">0</span>/36
+  </div>
+  <div class="sb-total">
+    TOTAL: <span id="sp-total">0</span>/100
+  </div>
+</div>
+
+<!-- CONTENEDOR -->
+<div class="container">
+
+  <!-- ENCABEZADO -->
+  <div class="eval-header">
+    <div class="eval-tag">
+      Evaluación Creativa Final · EmoSense
+    </div>
+    <h1>4 tipos de ejercicios<br>100 puntos · 45 minutos</h1>
+    <div class="eval-sub">
+      Código · Columnas · Espacios · Memorama
+    </div>
+    <div class="eval-meta">
+      <span>💻 5 preguntas de código</span>
+      <span>🔗 6 pares de columnas</span>
+      <span>✍️ 5 espacios a rellenar</span>
+      <span>🃏 18 pares de memorama</span>
+    </div>
+  </div>
+
+  <!-- DATOS -->
+  <div class="student-card">
+    <div class="sc-title">Datos del alumno</div>
+    <div class="sc-grid">
+      <div class="sc-field">
+        <label>Nombre completo</label>
+        <input type="text" id="inp-nombre"
+               placeholder="Tu nombre">
+      </div>
+      <div class="sc-field">
+        <label>Grupo</label>
+        <input type="text" id="inp-grupo"
+               placeholder="Ej: LSC-2B">
+      </div>
+      <div class="sc-field">
+        <label>Fecha</label>
+        <input type="text" id="inp-fecha">
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 1 · CONCEPTOS BÁSICOS DE CÓDIGO
+  ══════════════════════════════════════════ -->
+  <div class="section-title" style="margin-top:24px">
+    💻 Sección 1 · Conceptos básicos de código
+    <span style="font-family:var(--font-mono);
+                 font-size:11px;color:var(--text2);
+                 margin-left:8px">20 pts · 5 preguntas × 4 pts</span>
+  </div>
+
+  <div class="context-box" style="margin-bottom:18px">
+    <div class="ctx-title">Instrucción</div>
+    <p>Lee cada fragmento de código del proyecto EmoSense.
+       Selecciona la opción que mejor describe qué hace o
+       qué retorna. Una vez elegida, no puedes cambiar tu respuesta.</p>
+  </div>
+
+  <div id="code-questions"></div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 2 · COLUMNAS RELACIONADAS
+  ══════════════════════════════════════════ -->
+  <div class="section-title" style="margin-top:32px">
+    🔗 Sección 2 · Columnas relacionadas
+    <span style="font-family:var(--font-mono);
+                 font-size:11px;color:var(--text2);
+                 margin-left:8px">24 pts · 6 pares × 4 pts</span>
+  </div>
+
+  <div class="context-box" style="margin-bottom:14px">
+    <div class="ctx-title">Instrucción</div>
+    <p>Haz clic en un elemento de la columna izquierda
+       y luego en su definición en la columna derecha.
+       Si el par es correcto se marca en verde. Si no, intenta de nuevo.</p>
+  </div>
+
+  <div class="cols-wrap">
+    <div id="col-left"></div>
+    <div id="col-right"></div>
+  </div>
+
+  <div class="matched-list" id="matched-list"></div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 3 · RELLENAR ESPACIOS
+  ══════════════════════════════════════════ -->
+  <div class="section-title" style="margin-top:32px">
+    ✍️ Sección 3 · Rellena los espacios
+    <span style="font-family:var(--font-mono);
+                 font-size:11px;color:var(--text2);
+                 margin-left:8px">20 pts · 5 espacios × 4 pts</span>
+  </div>
+
+  <div class="context-box" style="margin-bottom:14px">
+    <div class="ctx-title">Instrucción</div>
+    <p>Haz clic en una palabra del banco y luego
+       en el espacio donde debe ir (<code style="font-family:var(--font-mono)">___</code>).
+       Para devolver una palabra haz clic en el espacio relleno.</p>
+  </div>
+
+  <div class="word-bank" id="word-bank"></div>
+  <div id="blank-exercises"></div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 4 · MEMORAMA
+  ══════════════════════════════════════════ -->
+  <div class="section-title" style="margin-top:32px">
+    🃏 Sección 4 · Memorama de conceptos
+    <span style="font-family:var(--font-mono);
+                 font-size:11px;color:var(--text2);
+                 margin-left:8px">36 pts · 18 pares × 2 pts</span>
+  </div>
+
+  <div class="context-box" style="margin-bottom:14px">
+    <div class="ctx-title">Instrucción</div>
+    <p>Voltea dos cartas. Si coinciden (término + definición)
+       se quedan boca arriba y sumas puntos. Si no, se voltean de nuevo.
+       Encuentra todos los pares para maximizar tu puntaje.</p>
+  </div>
+
+  <div class="memo-info">
+    <div class="memo-stat">
+      Pares encontrados: <span id="memo-found">0</span>/18
+    </div>
+    <div class="memo-stat">
+      Intentos: <span id="memo-tries">0</span>
+    </div>
+    <div class="memo-stat">
+      Puntaje: <span id="memo-pts">0</span>/36
+    </div>
+  </div>
+
+  <div class="memo-grid" id="memo-grid"></div>
+
+
+  <!-- ENVIAR -->
+  <div class="submit-wrap" style="margin-top:32px">
+    <button class="btn btn-primary btn-block"
+            id="submit-btn"
+            onclick="submitAll()">
+      Ver resultado final
+    </button>
+    <div class="submit-note">
+      Puedes entregar en cualquier momento.
+      El memorama y los espacios se verifican al entregar.
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="result-panel" style="display:none">
+
+    <div style="text-align:center;
+                padding:28px 0 20px">
+      <div style="font-size:clamp(26px,5vw,44px);
+                  font-weight:900;
+                  background:linear-gradient(135deg,
+                    var(--accent),#f59e0b);
+                  -webkit-background-clip:text;
+                  -webkit-text-fill-color:transparent;
+                  margin-bottom:4px"
+           id="res-nombre">—</div>
+      <div style="font-family:var(--font-mono);
+                  font-size:11px;color:var(--text2);
+                  letter-spacing:.15em;
+                  text-transform:uppercase"
+           id="res-grupo">—</div>
+    </div>
+
+    <div class="res-grid">
+      <div class="rg-item">
+        <div class="rg-val" id="rg1">0</div>
+        <div class="rg-lbl">Código</div>
+        <div class="rg-max">/ 20</div>
+      </div>
+      <div class="rg-item">
+        <div class="rg-val" id="rg2">0</div>
+        <div class="rg-lbl">Columnas</div>
+        <div class="rg-max">/ 24</div>
+      </div>
+      <div class="rg-item">
+        <div class="rg-val" id="rg3">0</div>
+        <div class="rg-lbl">Espacios</div>
+        <div class="rg-max">/ 20</div>
+      </div>
+      <div class="rg-item">
+        <div class="rg-val" id="rg4">0</div>
+        <div class="rg-lbl">Memorama</div>
+        <div class="rg-max">/ 36</div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);
+                border:1px solid var(--border2);
+                border-radius:var(--radius);
+                padding:24px;text-align:center;
+                margin-bottom:20px">
+      <div style="font-family:var(--font-mono);
+                  font-size:10px;color:var(--text2);
+                  letter-spacing:.15em;
+                  text-transform:uppercase;
+                  margin-bottom:8px">
+        PUNTAJE FINAL
+      </div>
+      <div style="font-family:var(--font-mono);
+                  font-size:clamp(56px,12vw,96px);
+                  font-weight:900;line-height:1"
+           id="res-total">0</div>
+      <div style="font-size:14px;color:var(--text2);
+                  margin-top:6px">de 100 puntos</div>
+      <div id="res-rank" style="margin-top:16px"></div>
+    </div>
+
+    <div class="breakdown">
+      <h3>Detalle sección por sección</h3>
+      <div id="bd-detail"></div>
+    </div>
+
+  </div>
+
+</div><!-- /container -->
+
+<!-- INFRACCIÓN OVERLAY -->
+<div id="alert-overlay">
+  <div class="alert-box">
+    <div class="alert-icon">⚠️</div>
+    <h3>Acción registrada</h3>
+    <p id="alert-msg">Esta acción queda en tu reporte.</p>
+    <button class="btn btn-secondary"
+            onclick="closeAlert()">
+      Entendido
+    </button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   DATOS
+════════════════════════════════════════════ */
+
+/* ── S1: PREGUNTAS DE CÓDIGO ─────────────── */
+const CODE_QS = [
+  {
+    id:1,
+    label:"¿Qué hace esta línea?",
+    code:`<span class="kw">import</span> <span class="hl">joblib</span>
+<span class="fn">joblib</span>.<span class="fn">dump</span>(modelo, <span class="st">"modelos/modelo.pkl"</span>)`,
+    opts:[
+      "Carga el modelo guardado desde el archivo .pkl.",
+      "Serializa y guarda el modelo entrenado en un archivo .pkl.",
+      "Imprime el resumen del modelo en la consola.",
+      "Elimina el archivo modelo.pkl si ya existe.",
+    ],
+    correct:1,
+  },
+  {
+    id:2,
+    label:"¿Qué devuelve esta expresión?",
+    code:`textos_limpios = [
+    <span class="fn">limpiar_texto</span>(t) <span class="kw">for</span> t <span class="kw">in</span> textos
+]`,
+    opts:[
+      "Un entero con la cantidad de frases procesadas.",
+      "Un diccionario {frase: emoción} del dataset.",
+      "Una lista con cada frase preprocesada (minúsculas, sin signos).",
+      "El vectorizador TF-IDF ajustado al dataset.",
+    ],
+    correct:2,
+  },
+  {
+    id:3,
+    label:"¿Qué hace este bloque de código?",
+    code:`pipeline = <span class="fn">Pipeline</span>([
+    (<span class="st">"tfidf"</span>, <span class="fn">TfidfVectorizer</span>(
+         max_features=<span class="nm">500</span>)),
+    (<span class="st">"clf"</span>,  <span class="fn">RandomForestClassifier</span>(
+         n_estimators=<span class="nm">100</span>)),
+])`,
+    opts:[
+      "Crea dos modelos separados que votan por la emoción.",
+      "Encadena TF-IDF y Random Forest en un único objeto reutilizable.",
+      "Define los hiperparámetros del dataset de entrenamiento.",
+      "Entrena el modelo directamente con textos crudos.",
+    ],
+    correct:1,
+  },
+  {
+    id:4,
+    label:"¿Qué retorna predict_proba?",
+    code:`probs = pipeline.<span class="fn">predict_proba</span>(
+    [texto_limpio]
+)[<span class="nm">0</span>]
+confianza = <span class="fn">max</span>(probs) * <span class="nm">100</span>`,
+    opts:[
+      "El nombre en texto de la emoción predicha.",
+      "Un número entero con el índice de la emoción.",
+      "Un array con la probabilidad de cada emoción y la mayor como %.",
+      "La lista de nombres de las 6 emociones disponibles.",
+    ],
+    correct:2,
+  },
+  {
+    id:5,
+    label:"¿Qué calcula este código?",
+    code:`scores = <span class="fn">cross_val_score</span>(
+    pipeline,
+    textos_limpios,
+    etiquetas,
+    cv      = <span class="nm">5</span>,
+    scoring = <span class="st">"f1_weighted"</span>,
+)
+media = scores.<span class="fn">mean</span>()`,
+    opts:[
+      "El accuracy del modelo en un único conjunto de prueba.",
+      "El F1 promedio evaluado en 5 particiones distintas del dataset.",
+      "La cantidad de emociones que el modelo clasificó correctamente.",
+      "El tiempo total de entrenamiento del pipeline.",
+    ],
+    correct:1,
+  },
+];
+
+/* ── S2: COLUMNAS RELACIONADAS ───────────── */
+const PAIRS = [
+  {
+    id:1,
+    left:"n_estimators",
+    right:"Número de árboles que componen el Random Forest.",
+  },
+  {
+    id:2,
+    left:"RESPUESTAS",
+    right:"Diccionario con frases empáticas por emoción en el chat.",
+  },
+  {
+    id:3,
+    left:"StratifiedKFold",
+    right:"Divide en pliegues garantizando todas las clases en cada uno.",
+  },
+  {
+    id:4,
+    left:"max_features",
+    right:"Controla el tamaño máximo del vocabulario TF-IDF.",
+  },
+  {
+    id:5,
+    left:"root.mainloop()",
+    right:"Mantiene activa la ventana de tkinter esperando eventos.",
+  },
+  {
+    id:6,
+    left:"matplotlib.use('TkAgg')",
+    right:"Configura el backend gráfico antes de importar pyplot.",
+  },
+];
+
+/* ── S3: RELLENAR ESPACIOS ───────────────── */
+const BLANKS = [
+  {
+    id:1,
+    label:"Importación necesaria para guardar/cargar el modelo:",
+    before:"",
+    after:` <span class="kw">import</span> <span class="fn">matplotlib</span>
+<span class="fn">matplotlib</span>.<span class="fn">use</span>(<span class="st">"TkAgg"</span>)`,
+    answer:"import",
+    hint:"import ___ matplotlib",
+  },
+  {
+    id:2,
+    label:"Longitud de n-gramas para incluir pares de palabras:",
+    before:`<span class="nm">NGRAM_RANGE</span> = (<span class="nm">1</span>, `,
+    after:`)`,
+    answer:"2",
+    hint:"(1, ___)",
+  },
+  {
+    id:3,
+    label:"Clase que encadena TF-IDF y el clasificador:",
+    before:`pipeline = `,
+    after:`([
+    (<span class="st">"tfidf"</span>, TfidfVectorizer()),
+    (<span class="st">"clf"</span>, RandomForestClassifier()),
+])`,
+    answer:"Pipeline",
+    hint:"___([ ... ])",
+  },
+  {
+    id:4,
+    label:"Semilla estándar de reproducibilidad en EmoSense:",
+    before:`cv = StratifiedKFold(
+    n_splits     = <span class="nm">5</span>,
+    shuffle      = <span class="kw">True</span>,
+    random_state = `,
+    after:`)`,
+    answer:"42",
+    hint:"random_state = ___",
+  },
+  {
+    id:5,
+    label:"Método del pipeline que retorna la emoción predicha:",
+    before:`emocion = pipeline.`,
+    after:`(
+    [texto_limpio]
+)[<span class="nm">0</span>]`,
+    answer:"predict",
+    hint:"pipeline.___([texto])[0]",
+  },
+];
+
+const WORD_BANK_WORDS = [
+  "import","2","Pipeline","42","predict",
+  "fit","3","joblib","None","transform",
+];
+
+/* ── S4: MEMORAMA ─────────────────────────── */
+const MEMO_PAIRS = [
+  {id:1, a:"TF-IDF", b:"Vectoriza texto en números"},
+  {id:2, a:"Pipeline", b:"Encadena pasos de ML"},
+  {id:3, a:"Recall", b:"TP / (TP + FN)"},
+  {id:4, a:"Precision", b:"TP / (TP + FP)"},
+  {id:5, a:"F1-Score", b:"Media armónica Precision y Recall"},
+  {id:6, a:"joblib.dump()", b:"Guarda el modelo en .pkl"},
+  {id:7, a:"max_depth", b:"Profundidad máxima del árbol RF"},
+  {id:8, a:"stratify", b:"Balancea clases al dividir el dataset"},
+  {id:9, a:"tkinter", b:"Librería para interfaces gráficas"},
+  {id:10, a:"cross_val_score", b:"Evalúa con múltiples pliegues"},
+  {id:11, a:"😊 Alegría", b:"Satisfacción y felicidad"},
+  {id:12, a:"😨 Miedo", b:"Terror y angustia"},
+  {id:13, a:"😡 Enojo", b:"Rabia e indignación"},
+  {id:14, a:"🤢 Asco", b:"Repulsión y rechazo"},
+  {id:15, a:"😲 Sorpresa", b:"Asombro inesperado"},
+  {id:16, a:"Overfitting", b:"Modelo memoriza sin generalizar"},
+  {id:17, a:"random_state=42", b:"Semilla de reproducibilidad"},
+  {id:18, a:"predict_proba()", b:"Retorna probabilidad por clase"},
+];
+
+/* ════════════════════════════════════════════
+   ESTADO
+════════════════════════════════════════════ */
+let codeAnswers = {};
+let codeLocked  = {};
+let s1Score = 0;
+
+let selLeft  = null;
+let matchDone= {};
+let s2Score  = 0;
+
+let fills       = {};
+let selWord     = null;
+let s3Score     = 0;
+
+let memoFlipped   = [];
+let memoMatched   = new Set();
+let memoTries     = 0;
+let memoLock      = false;
+let s4Score       = 0;
+
+let infractions = 0;
+let submitted   = false;
+let timerSec    = 45 * 60;
+let timerInt    = null;
+
+/* ════════════════════════════════════════════
+   TIMER
+════════════════════════════════════════════ */
+function fmt(s){
+  return Math.floor(s/60)+':'+
+         String(s%60).padStart(2,'0');
+}
+function startTimer(){
+  const el=document.getElementById('timer');
+  timerInt=setInterval(()=>{
+    timerSec--;
+    el.textContent=fmt(timerSec);
+    if(timerSec<=300)el.className='warn';
+    if(timerSec<=60) el.className='danger';
+    if(timerSec<=0){
+      clearInterval(timerInt);
+      if(!submitted) submitAll();
+    }
+  },1000);
+}
+
+/* ════════════════════════════════════════════
+   ACTUALIZAR BARRA DE PUNTAJE
+════════════════════════════════════════════ */
+function updateBar(){
+  document.getElementById('sp1').textContent=s1Score;
+  document.getElementById('sp2').textContent=s2Score;
+  document.getElementById('sp3').textContent=s3Score;
+  document.getElementById('sp4').textContent=s4Score;
+  document.getElementById('sp-total').textContent=
+    s1Score+s2Score+s3Score+s4Score;
+}
+
+/* ════════════════════════════════════════════
+   SECCIÓN 1 — CÓDIGO
+════════════════════════════════════════════ */
+function buildCodeQuestions(){
+  const wrap=document.getElementById('code-questions');
+  CODE_QS.forEach(q=>{
+    const div=document.createElement('div');
+    div.className='q-card';
+    div.id='cq-'+q.id;
+    const letters=['A','B','C','D'];
+    div.innerHTML=
+      `<div class="qn">Pregunta ${q.id} · 4 pts</div>
+       <div class="qt">${q.label}</div>
+       <div class="code-q">${q.code}</div>
+       <div class="code-opts" id="copts-${q.id}">`
+      +q.opts.map((o,i)=>
+        `<div class="code-opt"
+              id="copt-${q.id}-${i}"
+              onclick="pickCode(${q.id},${i})">
+           <span class="ol">${letters[i]}</span>
+           <span>${o}</span>
+         </div>`
+      ).join('')
+      +`</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function pickCode(qid,idx){
+  if(codeLocked[qid]||submitted) return;
+  codeLocked[qid]=true;
+  codeAnswers[qid]=idx;
+  const q=CODE_QS.find(x=>x.id===qid);
+  for(let i=0;i<4;i++){
+    const el=document.getElementById(`copt-${qid}-${i}`);
+    el.classList.add('locked');
+    if(i===idx) el.classList.add('selected');
+  }
+  document.getElementById('cq-'+qid)
+          .classList.add('answered');
+}
+
+function scoreCode(){
+  s1Score=0;
+  CODE_QS.forEach(q=>{
+    const ch=codeAnswers[q.id];
+    if(ch===undefined) return;
+    /* Reveal */
+    for(let i=0;i<4;i++){
+      const el=document.getElementById(`copt-${q.id}-${i}`);
+      el.classList.remove('selected','locked');
+      if(i===q.correct) el.classList.add('reveal-ok');
+      else if(i===ch&&i!==q.correct)
+        el.classList.add('reveal-err');
+      else el.style.opacity='.25';
+    }
+    if(ch===q.correct) s1Score+=4;
+  });
+  updateBar();
+  return s1Score;
+}
+
+/* ════════════════════════════════════════════
+   SECCIÓN 2 — COLUMNAS
+════════════════════════════════════════════ */
+function buildColumns(){
+  const lc=document.getElementById('col-left');
+  const rc=document.getElementById('col-right');
+  /* Shuffle right column */
+  const shuffled=[...PAIRS]
+    .sort(()=>Math.random()-.5);
+  PAIRS.forEach(p=>{
+    const li=document.createElement('div');
+    li.className='col-item';
+    li.id='cl-'+p.id;
+    li.innerHTML=
+      `<span class="col-num">${p.id}</span>${p.left}`;
+    li.onclick=()=>clickLeft(p.id);
+    lc.appendChild(li);
+  });
+  shuffled.forEach(p=>{
+    const ri=document.createElement('div');
+    ri.className='col-item';
+    ri.id='cr-'+p.id;
+    ri.innerHTML=`<span class="col-num">—</span>${p.right}`;
+    ri.onclick=()=>clickRight(p.id);
+    rc.appendChild(ri);
+  });
+}
+
+function clickLeft(id){
+  if(matchDone[id]||submitted) return;
+  /* Deselect previous */
+  if(selLeft!==null){
+    const prev=document.getElementById('cl-'+selLeft);
+    if(prev) prev.classList.remove('sel');
+  }
+  selLeft=id;
+  document.getElementById('cl-'+id)
+          .classList.add('sel');
+}
+
+function clickRight(id){
+  if(submitted) return;
+  if(matchDone[id]){return;}
+  if(selLeft===null) return;
+
+  if(selLeft===id){
+    /* Correct match */
+    matchDone[id]=true;
+    const lEl=document.getElementById('cl-'+selLeft);
+    const rEl=document.getElementById('cr-'+id);
+    lEl.classList.remove('sel');
+    lEl.classList.add('matched');
+    rEl.classList.add('matched');
+    s2Score+=4;
+    updateBar();
+    /* Add to matched list */
+    const pair=PAIRS.find(p=>p.id===id);
+    const li=document.createElement('div');
+    li.className='matched-item';
+    li.innerHTML=
+      `<strong style="color:var(--green)">${pair.left}</strong>
+       <span class="mi-arrow">→</span>
+       <span>${pair.right}</span>`;
+    document.getElementById('matched-list')
+            .appendChild(li);
+    selLeft=null;
+  } else {
+    /* Wrong */
+    const lEl=document.getElementById('cl-'+selLeft);
+    const rEl=document.getElementById('cr-'+id);
+    lEl.classList.remove('sel');
+    lEl.classList.add('wrong');
+    rEl.classList.add('wrong');
+    setTimeout(()=>{
+      lEl.classList.remove('wrong');
+      rEl.classList.remove('wrong');
+    },900);
+    selLeft=null;
+  }
+}
+
+/* ════════════════════════════════════════════
+   SECCIÓN 3 — RELLENAR ESPACIOS
+════════════════════════════════════════════ */
+function buildBlanks(){
+  /* Word bank */
+  const wb=document.getElementById('word-bank');
+  WORD_BANK_WORDS.forEach(w=>{
+    const chip=document.createElement('span');
+    chip.className='word-chip';
+    chip.textContent=w;
+    chip.id='chip-'+w;
+    chip.onclick=()=>selectWord(w,chip);
+    wb.appendChild(chip);
+  });
+
+  /* Exercises */
+  const wrap=document.getElementById('blank-exercises');
+  BLANKS.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='blank-wrap';
+    div.innerHTML=
+      `<div class="blank-label">
+         Espacio ${b.id} — ${b.label}
+       </div>
+       <div class="code-q">`
+      +b.before
+      +`<span class="blank-slot"
+              id="bs-${b.id}"
+              onclick="fillBlank(${b.id})"
+              title="Haz clic para rellenar">
+         &nbsp;&nbsp;___&nbsp;&nbsp;
+       </span>`
+      +b.after
+      +`</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function selectWord(w,chip){
+  if(submitted) return;
+  /* Deselect previous */
+  document.querySelectorAll('.word-chip.sel-word')
+    .forEach(c=>c.classList.remove('sel-word'));
+  if(selWord===w){selWord=null;return;}
+  selWord=w;
+  chip.classList.add('sel-word');
+}
+
+function fillBlank(bid){
+  if(submitted) return;
+  const slot=document.getElementById('bs-'+bid);
+  /* If blank already filled — return word */
+  if(fills[bid]){
+    const old=fills[bid];
+    delete fills[bid];
+    slot.textContent='___';
+    slot.classList.remove('filled');
+    const oldChip=document.getElementById('chip-'+old);
+    if(oldChip){
+      oldChip.classList.remove('used','sel-word');
+    }
+    return;
+  }
+  if(!selWord) return;
+  /* Fill */
+  fills[bid]=selWord;
+  slot.textContent=selWord;
+  slot.classList.add('filled');
+  const chip=document.getElementById('chip-'+selWord);
+  if(chip){
+    chip.classList.add('used');
+    chip.classList.remove('sel-word');
+  }
+  selWord=null;
+}
+
+function scoreBlanks(){
+  s3Score=0;
+  BLANKS.forEach(b=>{
+    const slot=document.getElementById('bs-'+b.id);
+    const val=fills[b.id];
+    if(val===b.answer){
+      s3Score+=4;
+      slot.classList.add('correct-blank');
+    } else {
+      slot.classList.add('wrong-blank');
+      slot.textContent=
+        (val||'__')+'  ✗  →  '+b.answer;
+    }
+  });
+  updateBar();
+  return s3Score;
+}
+
+/* ════════════════════════════════════════════
+   SECCIÓN 4 — MEMORAMA
+════════════════════════════════════════════ */
+function buildMemorama(){
+  /* Create 36 cards (18 pairs × 2) */
+  const cards=[];
+  MEMO_PAIRS.forEach(p=>{
+    cards.push({uid:p.id+'a',pair:p.id,text:p.a});
+    cards.push({uid:p.id+'b',pair:p.id,text:p.b});
+  });
+  /* Shuffle */
+  cards.sort(()=>Math.random()-.5);
+
+  const grid=document.getElementById('memo-grid');
+  cards.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='memo-card';
+    div.id='mc-'+c.uid;
+    div.dataset.pair=c.pair;
+    div.dataset.uid=c.uid;
+    div.innerHTML=
+      `<div class="memo-inner">
+         <div class="memo-front">🧠</div>
+         <div class="memo-back">${c.text}</div>
+       </div>`;
+    div.onclick=()=>flipCard(c.uid,c.pair);
+    grid.appendChild(div);
+  });
+}
+
+function flipCard(uid,pair){
+  if(memoLock||submitted) return;
+  if(memoMatched.has(pair)) return;
+  const el=document.getElementById('mc-'+uid);
+  if(el.classList.contains('flipped')) return;
+
+  el.classList.add('flipped');
+  memoFlipped.push({uid,pair,el});
+
+  if(memoFlipped.length===2){
+    memoTries++;
+    document.getElementById('memo-tries')
+            .textContent=memoTries;
+    memoLock=true;
+    const [a,b]=memoFlipped;
+    if(a.pair===b.pair){
+      /* Match! */
+      setTimeout(()=>{
+        a.el.classList.add('matched');
+        b.el.classList.add('matched');
+        memoMatched.add(a.pair);
+        s4Score+=2;
+        document.getElementById('memo-found')
+                .textContent=memoMatched.size;
+        document.getElementById('memo-pts')
+                .textContent=s4Score;
+        updateBar();
+        memoFlipped=[];
+        memoLock=false;
+      },400);
+    } else {
+      /* No match */
+      setTimeout(()=>{
+        a.el.classList.remove('flipped');
+        b.el.classList.remove('flipped');
+        memoFlipped=[];
+        memoLock=false;
+      },1000);
+    }
+  }
+}
+
+/* ════════════════════════════════════════════
+   ENVIAR TODO
+════════════════════════════════════════════ */
+function submitAll(){
+  if(submitted) return;
+  const nombre=document.getElementById('inp-nombre')
+    .value.trim();
+  if(!nombre){alert('Escribe tu nombre.');return;}
+  submitted=true;
+  clearInterval(timerInt);
+  document.getElementById('submit-btn').disabled=true;
+
+  const s1=scoreCode();
+  const s3=scoreBlanks();
+  const s2=s2Score;
+  const s4=s4Score;
+  const total=s1+s2+s3+s4;
+
+  const grupo=document.getElementById('inp-grupo')
+    .value.trim()||'—';
+
+  document.getElementById('res-nombre')
+          .textContent=nombre;
+  document.getElementById('res-grupo')
+          .textContent=
+    `${grupo} · EmoSense Evaluación Creativa`;
+
+  document.getElementById('res-total')
+          .textContent=total;
+  document.getElementById('rg1').textContent=s1;
+  document.getElementById('rg2').textContent=s2;
+  document.getElementById('rg3').textContent=s3;
+  document.getElementById('rg4').textContent=s4;
+
+  const rankData=
+    total>=90?['RANGO  S','rank-s']:
+    total>=75?['RANGO  A','rank-a']:
+    total>=60?['RANGO  B','rank-b']:
+              ['RANGO  C','rank-c'];
+  document.getElementById('res-rank').innerHTML=
+    `<span class="result-rank ${rankData[1]}">
+       ${rankData[0]}
+     </span>`;
+
+  /* Detalle */
+  const det=[
+    {sec:'💻 Código',     scored:s1, max:20,
+     note:Object.keys(codeAnswers).length+'/5 respondidas'},
+    {sec:'🔗 Columnas',   scored:s2, max:24,
+     note:Object.keys(matchDone).length+'/6 pares encontrados'},
+    {sec:'✍️ Espacios',   scored:s3, max:20,
+     note:Object.keys(fills).length+'/5 espacios rellenados'},
+    {sec:'🃏 Memorama',   scored:s4, max:36,
+     note:memoMatched.size+'/18 pares · '+memoTries+' intentos'},
+  ];
+  document.getElementById('bd-detail').innerHTML=
+    det.map(d=>`
+      <div class="bd-row">
+        <span class="bd-num" style="min-width:130px;
+              font-size:13px">${d.sec}</span>
+        <span class="bd-text">${d.note}</span>
+        <span class="bd-status ${d.scored>=d.max*.7?'ok':'fail'}">
+          ${d.scored}/${d.max}
+        </span>
+      </div>`
+    ).join('');
+
+  document.getElementById('result-panel')
+          .style.display='block';
+  document.getElementById('result-panel')
+          .scrollIntoView({behavior:'smooth'});
+}
+
+/* ════════════════════════════════════════════
+   INFRACCIONES
+════════════════════════════════════════════ */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden&&!submitted){
+    infractions++;
+    document.getElementById('infr-cnt')
+            .textContent=infractions;
+    document.getElementById('infr-badge')
+            .style.display='inline';
+    document.getElementById('alert-msg')
+            .textContent=
+      'Cambio de pestaña detectado. '
+      +'Infracción #'+infractions+' registrada.';
+    document.getElementById('alert-overlay')
+            .classList.add('show');
+  }
+});
+document.addEventListener('contextmenu',e=>{
+  if(!submitted){
+    e.preventDefault();
+    infractions++;
+    document.getElementById('infr-cnt')
+            .textContent=infractions;
+    document.getElementById('infr-badge')
+            .style.display='inline';
+    document.getElementById('alert-msg')
+            .textContent=
+      'Clic derecho registrado. '
+      +'Infracción #'+infractions+'.';
+    document.getElementById('alert-overlay')
+            .classList.add('show');
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(submitted) return;
+  if(e.key==='F12'||(e.ctrlKey&&e.shiftKey&&
+     (e.key==='I'||e.key==='J'))){
+    e.preventDefault();
+    infractions++;
+    document.getElementById('infr-cnt')
+            .textContent=infractions;
+    document.getElementById('infr-badge')
+            .style.display='inline';
+  }
+});
+function closeAlert(){
+  document.getElementById('alert-overlay')
+          .classList.remove('show');
+}
+
+/* ════════════════════════════════════════════
+   TEMA
+════════════════════════════════════════════ */
+function toggleTheme(){
+  const d=document.documentElement;
+  const dark=!d.hasAttribute('data-theme');
+  d.setAttribute('data-theme',dark?'light':'');
+  document.getElementById('theme-toggle')
+          .textContent=dark?'🌙':'☀️';
+}
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  document.getElementById('inp-fecha').value=
+    new Date().toLocaleDateString('es-MX');
+  buildCodeQuestions();
+  buildColumns();
+  buildBlanks();
+  buildMemorama();
+  startTimer();
+});
+</script>
+</body>
+</html>
